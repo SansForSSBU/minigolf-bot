@@ -8,5 +8,6 @@ dependencies = ["pygame>=2.6.1"]
 
 [dependency-groups]
 dev = [
+    "pre-commit>=4.2.0",
     "ruff>=0.12.7",
 ]
