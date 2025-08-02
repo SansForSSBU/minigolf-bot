@@ -9,6 +9,7 @@ dependencies = [
     "loguru>=0.7.3",
     "pydantic>=2.11.7",
     "pygame>=2.6.1",
+    "pymunk>=7.1.0",
 ]
 
 [tool.setuptools]
