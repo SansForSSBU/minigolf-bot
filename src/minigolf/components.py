@@ -36,12 +36,6 @@ class PhysicsBody(BaseModel):
     bounciness: float  # restitution
     friction: float
 
-    def to_pymunk(self):
-        body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-        body.mass = self.mass
-        body.moment = 1  # TODO: Infer or add moment attribute.
-        return body
-
 
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
@@ -53,7 +47,7 @@ class Entity:
         pass
 
     @classmethod
-    def from_eid(cls, world, eid):
+    def from_eid(cls, world, eid) -> "Entity":
         entity = cls()
         for componentCls, v in world.components.items():
             if v.get(eid, None) is not None:
@@ -61,7 +55,9 @@ class Entity:
                 setattr(entity, attrName, v[eid])
         return entity
 
-    def pymunk_position(self):
+    def pymunk_position(self) -> tuple[int, int] | None:
+        if not hasattr(self, "position"):
+            return None
         if self.collider.shape.type == "rect":
             return (
                 self.position.x + self.collider.shape.width / 2,
@@ -70,13 +66,15 @@ class Entity:
         else:
             raise NotImplementedError
 
-    def to_pymunk(self):
+    def to_pymunk(self) -> tuple[pymunk.Body, pymunk.Poly] | None:
         if not (hasattr(self, "position") and hasattr(self, "collider")):
             return None
         if self.collider.shape.type != "rect":
             raise NotImplementedError
         if hasattr(self, "velocity") and hasattr(self, "physicsBody"):
-            body = self.physicsBody.to_pymunk()
+            body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
+            body.mass = self.physicsBody.mass
+            body.moment = 1  # TODO: Infer or add moment attribute.
             body.velocity = (self.velocity.dx, self.velocity.dy)
         else:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
@@ -87,6 +85,22 @@ class Entity:
         shape.elasticity = 1
         shape.friction = 0
         return body, shape
+
+    def from_pymunk_position(self, pos: pymunk.Vec2d) -> Position:
+        if self.collider.shape.type == "rect":
+            bx, by = pos
+            return Position(
+                x=bx - (self.collider.shape.width / 2),
+                y=by - (self.collider.shape.height / 2),
+            )
+        else:
+            raise NotImplementedError
+
+    def sync_with_pymunk_body(self, body) -> None:
+        if hasattr(self, "position"):
+            new_pos = self.from_pymunk_position(body.position)
+            self.position.x = new_pos.x
+            self.position.y = new_pos.y
 
     def to_pygame(self):
         raise NotImplementedError
