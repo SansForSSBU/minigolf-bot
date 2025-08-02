@@ -15,3 +15,6 @@ uv pip install pre-commit
 # Install pre-commit hooks
 echo "Installing hooks..."
 uv run pre-commit install
+
+# Install project
+uv pip install -e .
