@@ -6,9 +6,7 @@ import pygame
 from loguru import logger
 
 from minigolf.levels import create_level1
-from minigolf.systems.collision import detect_collisions, resolve_collisions
-from minigolf.systems.movement import movement_system
-from minigolf.systems.physics import physics_system
+from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.rendering import render_system
 from minigolf.world import World
 
@@ -17,6 +15,8 @@ from minigolf.world import World
 def main_loop(world: World) -> None:
     pygame.init()
     screen = pygame.display.set_mode((1000, 1000))
+    physics_system = PhysicsSpace(world)
+    physics_system.populate()
     clock = pygame.time.Clock()
 
     while True:
@@ -25,12 +25,9 @@ def main_loop(world: World) -> None:
                 pygame.quit()
                 sys.exit()
 
-        physics_system(world)
-        movement_system(world)
-        collisions = detect_collisions(world)
-        resolve_collisions(world, collisions)
+        physics_system.step()
         render_system(world, screen)
-
+        pygame.display.flip()
         clock.tick(60)
 
 

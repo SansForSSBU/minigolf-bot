@@ -1,10 +1,30 @@
-from minigolf.world import World
-from minigolf.components import Velocity, PhysicsBody
+from minigolf.components import Position, Collider, Entity
+import pymunk
 
 
-def physics_system(world: World) -> None:
-    for _ in world.all_with(Velocity, PhysicsBody):
-        # TODO: Implement actual physics logic
-        # vel = world.get(Velocity, eid)
-        # body = world.get(PhysicsBody, eid)
-        return
+class PhysicsSpace:
+    def __init__(self, world):
+        self.world = world
+        self.space = pymunk.Space(world)
+        self.eid_to_body = {}
+
+    def populate(self):
+        for eid in self.world.all_with(Position, Collider):
+            entity = self.world.get_entity(eid)
+            body, shape = entity.to_pymunk()
+            self.space.add(body, shape)
+            self.eid_to_body[eid] = body  # Store mapping
+
+    def step(self, timestep=1 / 60, substeps=50):
+        for _ in range(substeps):
+            self.space.step(timestep / substeps)
+
+        for eid, body in self.eid_to_body.items():
+            entity = self.world.get_entity(eid)
+            entity.sync_with_pymunk_body(body)
+
+    def add_entity(self, entity: Entity) -> None:
+        raise NotImplementedError
+
+    def rm_entity(self, entity: Entity) -> None:
+        raise NotImplementedError
