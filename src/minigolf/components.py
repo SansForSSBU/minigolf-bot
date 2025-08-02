@@ -55,7 +55,7 @@ class Entity:
                 setattr(entity, attrName, v[eid])
         return entity
 
-    def pymunk_position(self) -> tuple[int, int] | None:
+    def to_pymunk_position(self) -> tuple[int, int] | None:
         if not hasattr(self, "position"):
             return None
         if self.collider.shape.type == "rect":
@@ -80,7 +80,7 @@ class Entity:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
         width = self.collider.shape.width
         height = self.collider.shape.height
-        body.position = self.pymunk_position()
+        body.position = self.to_pymunk_position()
         shape = pymunk.Poly.create_box(body, (width, height))
         shape.elasticity = 1
         shape.friction = 0
