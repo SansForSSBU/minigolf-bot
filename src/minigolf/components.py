@@ -74,7 +74,7 @@ class Entity:
         if hasattr(self, "velocity") and hasattr(self, "physicsBody"):
             body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
             body.mass = self.physicsBody.mass
-            body.moment = 1  # TODO: Infer or add moment attribute.
+            body.moment = float("inf")  # TODO: Infer or add moment attribute.
             body.velocity = (self.velocity.dx, self.velocity.dy)
         else:
             body = pymunk.Body(body_type=pymunk.Body.STATIC)
