@@ -15,21 +15,21 @@ def create_level1(world: World) -> None:
     """
     # Clear the world before creating the level
     # Outer borders
-    create_wall(world, 100, 900, 800, 0)
-    create_wall(world, 900, 900, 0, -800)
-    create_wall(world, 900, 100, -800, 0)
-    create_wall(world, 100, 100, 0, 800)
+    create_wall(world, 100, 900, 800, 2)
+    create_wall(world, 900, 100, 2, 800)
+    create_wall(world, 100, 100, 800, 2)
+    create_wall(world, 100, 100, 2, 800)
 
     # Obstacle walls
-    create_wall(world, 100, 700, 600, 0)
-    create_wall(world, 700, 700, 0, -400)
-    create_wall(world, 700, 300, -400, 0)
-    create_wall(world, 300, 300, 0, 300)
+    create_wall(world, 100, 700, 600, 2)
+    create_wall(world, 700, 300, 2, 400)
+    create_wall(world, 300, 300, 400, 2)
+    create_wall(world, 300, 300, 2, 300)
 
     # Inner blockades
-    create_wall(world, 400, 600, 200, 0)
-    create_wall(world, 600, 600, 0, -200)
-    create_wall(world, 600, 400, -200, 0)
+    create_wall(world, 400, 600, 200, 2)
+    create_wall(world, 600, 400, 2, 200)
+    create_wall(world, 400, 400, 200, 2)
 
     # Ball
     create_ball(world, 200, 800, dx=0, dy=0)
