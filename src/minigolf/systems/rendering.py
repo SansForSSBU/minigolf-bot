@@ -1,15 +1,21 @@
 import pygame
 
 from minigolf.components import Position, Renderable
+from minigolf.entity import Entity
 from minigolf.world import World
 
 
-def render_entity(screen, entity) -> None:
-    if entity.renderable.shape.type == "rect":
-        rect = entity.renderable.shape.to_pygame_shape(
-            Position(x=entity.position.x, y=entity.position.y)
-        )
-        pygame.draw.rect(surface=screen, color=entity.renderable.colour, rect=rect)
+def render_entity(screen: pygame.Surface, entity: Entity) -> None:
+    renderable = entity.get(Renderable)
+    if renderable and renderable.shape.type == "rect":
+        pos: Position | None = entity.get(Position)
+        render = entity.get(Renderable)
+        if not (pos and render):
+            return
+        rect = render.shape.to_pygame_shape(pos)
+        if rect is None:
+            return
+        pygame.draw.rect(surface=screen, color=render.colour, rect=rect)
     else:
         raise NotImplementedError
 
