@@ -6,16 +6,8 @@ from minigolf.world import World
 
 def render_object(screen, pos, rend):
     if rend.shape.type == "rect":
-        # width = max(abs(rend.shape.width), 2)
-        # height = max(abs(rend.shape.height), 2)
-
-        # TODO: Prevent negative widths/heights
-        # Handle negative widths/heights
-        x = pos.x + min(0, rend.shape.width)
-        y = pos.y + min(0, rend.shape.height)
-
         rect = rend.shape.to_pygame_shape(
-            Position(x=x, y=y)
+            Position(x=pos.x, y=pos.y)
         )  # pygame.Rect(x, y, width, height)
         pygame.draw.rect(surface=screen, color=rend.colour, rect=rect)
 
