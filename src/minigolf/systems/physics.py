@@ -17,12 +17,12 @@ class PhysicsSpace:
                 body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
                 body.mass = 10
                 body.moment = 1
-                body.velocity = (100, -70)
+                body.velocity = (-100, -200)
             else:
                 body = pymunk.Body(body_type=pymunk.Body.STATIC)
-            body.position = (pos.x, pos.y)
             width = col.shape.width
             height = col.shape.height
+            body.position = (pos.x + width / 2, pos.y + height / 2)
             shape = pymunk.Poly.create_box(body, (width, height))
             self.space.add(body, shape)
             self.eid_to_body[eid] = body  # Store mapping
@@ -35,8 +35,12 @@ class PhysicsSpace:
         # Sync Pymunk body positions back to ECS
         for eid, body in self.eid_to_body.items():
             pos = self.world.get(Position, eid)
+            col = self.world.get(Collider, eid)
+            width = col.shape.width
+            height = col.shape.height
             if pos:
-                pos.x, pos.y = body.position
+                bx, by = body.position
+                pos.x, pos.y = bx - (width / 2), by - (height / 2)
 
     def add_object(self, eid):
         raise NotImplementedError

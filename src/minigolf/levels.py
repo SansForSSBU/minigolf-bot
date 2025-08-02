@@ -16,7 +16,7 @@ def create_level1(world: World) -> None:
     # Clear the world before creating the level
     # Outer borders
     create_wall(world, 100, 900, 800, 2)
-    create_wall(world, 900, 100, 100, 800)
+    create_wall(world, 900, 100, 2, 800)
     create_wall(world, 100, 100, 800, 2)
     create_wall(world, 100, 100, 2, 800)
 
