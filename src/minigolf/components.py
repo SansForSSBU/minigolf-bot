@@ -1,31 +1,26 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class Position:
+class Position(BaseModel):
     x: float
     y: float
 
 
-@dataclass
-class Velocity:
+class Velocity(BaseModel):
     dx: float
     dy: float
 
 
-@dataclass
-class Collider:
+class Collider(BaseModel):
     width: int
     height: int
 
 
-@dataclass
-class PhysicsBody:
+class PhysicsBody(BaseModel):
     mass: float
     bounciness: float  # restitution
     friction: float
 
 
-@dataclass
-class Renderable:
+class Renderable(BaseModel):
     colour: tuple[int, int, int]

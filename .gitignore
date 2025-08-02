@@ -201,3 +201,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Level files
+#  These are game-specific files that should not be tracked in version control.
+levels/
