@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Literal
 import pygame
+import pymunk
 
 
 class Position(BaseModel):
@@ -35,6 +36,12 @@ class PhysicsBody(BaseModel):
     bounciness: float  # restitution
     friction: float
 
+    def to_pymunk(self):
+        body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
+        body.mass = self.mass
+        body.moment = 1  # TODO: Infer or add moment attribute.
+        return body
+
 
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
@@ -50,8 +57,36 @@ class Entity:
         entity = cls()
         for componentCls, v in world.components.items():
             if v.get(eid, None) is not None:
-                attrName = (
-                    componentCls.__name__[0].lower() + componentCls.__name__[1:].lower()
-                )
+                attrName = componentCls.__name__[0].lower() + componentCls.__name__[1:]
                 setattr(entity, attrName, v[eid])
         return entity
+
+    def pymunk_position(self):
+        if self.collider.shape.type == "rect":
+            return (
+                self.position.x + self.collider.shape.width / 2,
+                self.position.y + self.collider.shape.height / 2,
+            )
+        else:
+            raise NotImplementedError
+
+    def to_pymunk(self):
+        if not (hasattr(self, "position") and hasattr(self, "collider")):
+            return None
+        if self.collider.shape.type != "rect":
+            raise NotImplementedError
+        if hasattr(self, "velocity") and hasattr(self, "physicsBody"):
+            body = self.physicsBody.to_pymunk()
+            body.velocity = (self.velocity.dx, self.velocity.dy)
+        else:
+            body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        width = self.collider.shape.width
+        height = self.collider.shape.height
+        body.position = self.pymunk_position()
+        shape = pymunk.Poly.create_box(body, (width, height))
+        shape.elasticity = 1
+        shape.friction = 0
+        return body, shape
+
+    def to_pygame(self):
+        raise NotImplementedError

@@ -1,4 +1,4 @@
-from minigolf.components import Velocity, Position, Collider, Entity
+from minigolf.components import Position, Collider, Entity
 import pymunk
 
 
@@ -10,22 +10,8 @@ class PhysicsSpace:
 
     def populate(self):
         for eid in self.world.all_with(Position, Collider):
-            col = self.world.get(Collider, eid)
-            pos = self.world.get(Position, eid)
-            vel = self.world.get(Velocity, eid)
-            if vel:
-                body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-                body.mass = 10
-                body.moment = 1
-                body.velocity = (vel.dx, vel.dy)
-            else:
-                body = pymunk.Body(body_type=pymunk.Body.STATIC)
-            width = col.shape.width
-            height = col.shape.height
-            body.position = (pos.x + width / 2, pos.y + height / 2)
-            shape = pymunk.Poly.create_box(body, (width, height))
-            shape.elasticity = 1
-            shape.friction = 0
+            entity = self.world.get_entity(eid)
+            body, shape = entity.to_pymunk()
             self.space.add(body, shape)
             self.eid_to_body[eid] = body  # Store mapping
 

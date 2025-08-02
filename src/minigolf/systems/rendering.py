@@ -4,10 +4,14 @@ from minigolf.components import Position, Renderable
 from minigolf.world import World
 
 
-def render_object(screen, pos, rend):
-    if rend.shape.type == "rect":
-        rect = rend.shape.to_pygame_shape(Position(x=pos.x, y=pos.y))
-        pygame.draw.rect(surface=screen, color=rend.colour, rect=rect)
+def render_entity(screen, entity):
+    if entity.renderable.shape.type == "rect":
+        rect = entity.renderable.shape.to_pygame_shape(
+            Position(x=entity.position.x, y=entity.position.y)
+        )
+        pygame.draw.rect(surface=screen, color=entity.renderable.colour, rect=rect)
+    else:
+        raise NotImplementedError
 
 
 def draw_bg(screen):
@@ -16,9 +20,8 @@ def draw_bg(screen):
 
 def render_objects(screen, world):
     for eid in world.all_with(Position, Renderable):
-        pos = world.get(Position, eid)
-        rend = world.get(Renderable, eid)
-        render_object(screen, pos, rend)
+        entity = world.get_entity(eid)
+        render_entity(screen, entity)
 
 
 def render_system(world: World, screen: pygame.Surface) -> None:
