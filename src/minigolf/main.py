@@ -25,16 +25,8 @@ def main_loop(world: World) -> None:
                 pygame.quit()
                 sys.exit()
 
-        # physics_system(world)
-        # movement_system(world)
-        # collisions = detect_collisions(world)
-        # resolve_collisions(world, collisions)
-
         physics_system.step()
         render_system(world, screen)
-        font = pygame.font.SysFont(None, 30)
-        fps_text = font.render(f"FPS: {clock.get_fps():.1f}", True, (255, 255, 0))
-        screen.blit(fps_text, (10, 10))
         pygame.display.flip()
         clock.tick(60)
 
