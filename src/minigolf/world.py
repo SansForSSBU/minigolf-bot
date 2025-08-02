@@ -5,6 +5,7 @@ from typing import Any, TypeVar, cast
 from pydantic import BaseModel
 
 from minigolf import components
+from minigolf.components import Entity
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -22,6 +23,9 @@ class World:
         self._next_id += 1
         self.entities.add(eid)
         return eid
+
+    def get_entity(self, eid) -> Entity:
+        return Entity.from_eid(self, eid)
 
     def get(self, component_type: type[T], eid: int) -> T | None:
         return cast(T | None, self.components[component_type].get(eid))

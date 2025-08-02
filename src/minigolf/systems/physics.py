@@ -1,4 +1,4 @@
-from minigolf.components import Velocity, Position, Collider
+from minigolf.components import Velocity, Position, Collider, Entity
 import pymunk
 
 
@@ -29,9 +29,6 @@ class PhysicsSpace:
             self.space.add(body, shape)
             self.eid_to_body[eid] = body  # Store mapping
 
-        pass
-
-    # Steps the simulation. All positions are updated automatically.
     def step(self, timestep=1 / 60, substeps=50):
         for _ in range(substeps):
             self.space.step(timestep / substeps)
@@ -45,5 +42,5 @@ class PhysicsSpace:
                 bx, by = body.position
                 pos.x, pos.y = bx - (width / 2), by - (height / 2)
 
-    def add_object(self, eid):
+    def add_object(self, entity: Entity):
         raise NotImplementedError

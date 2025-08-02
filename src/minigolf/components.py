@@ -39,3 +39,19 @@ class PhysicsBody(BaseModel):
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
     shape: Shape
+
+
+class Entity:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def from_eid(cls, world, eid):
+        entity = cls()
+        for componentCls, v in world.components.items():
+            if v.get(eid, None) is not None:
+                attrName = (
+                    componentCls.__name__[0].lower() + componentCls.__name__[1:].lower()
+                )
+                setattr(entity, attrName, v[eid])
+        return entity

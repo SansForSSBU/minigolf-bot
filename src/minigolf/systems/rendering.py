@@ -6,9 +6,7 @@ from minigolf.world import World
 
 def render_object(screen, pos, rend):
     if rend.shape.type == "rect":
-        rect = rend.shape.to_pygame_shape(
-            Position(x=pos.x, y=pos.y)
-        )  # pygame.Rect(x, y, width, height)
+        rect = rend.shape.to_pygame_shape(Position(x=pos.x, y=pos.y))
         pygame.draw.rect(surface=screen, color=rend.colour, rect=rect)
 
 
