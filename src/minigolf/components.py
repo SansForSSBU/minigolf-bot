@@ -1,12 +1,6 @@
 from pydantic import BaseModel
 from typing import Literal
-
-
-class Shape(BaseModel):
-    type: Literal["rect", "circle"]
-    width: int | None = None
-    height: int | None = None
-    radius: int | None = None
+import pygame
 
 
 class Position(BaseModel):
@@ -17,6 +11,19 @@ class Position(BaseModel):
 class Velocity(BaseModel):
     dx: float
     dy: float
+
+
+class Shape(BaseModel):
+    type: Literal["rect", "circle"]
+    width: int | None = None
+    height: int | None = None
+    radius: int | None = None
+
+    def to_pygame_shape(self, pos: Position):
+        if self.type == "rect":
+            return pygame.Rect(pos.x, pos.y, self.width, self.height)
+        elif self.type == "circle":
+            raise NotImplementedError
 
 
 class Collider(BaseModel):
