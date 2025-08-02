@@ -27,20 +27,23 @@ world.components[Position][wall] = Position(400, 300)
 world.components[Collider][wall] = Collider(200, 30)
 world.components[Renderable][wall] = Renderable((255, 0, 0))
 
-# Game loop
-while True:
-    # Event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
 
-    # Update systems
-    physics_system(world)
-    movement_system(world)
-    # Detect and resolve collisions
-    collisions = detect_collisions(world)
-    resolve_collisions(world, collisions)
-    # Render the world
-    render_system(world, screen)
-    clock.tick(60)
+# Game loop
+def main():
+    while True:
+        # Event handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # Update systems
+        physics_system(world)
+        movement_system(world)
+        # Detect and resolve collisions
+        collisions = detect_collisions(world)
+        resolve_collisions(world, collisions)
+        # Render the world
+        render_system(world, screen)
+
+        clock.tick(60)
