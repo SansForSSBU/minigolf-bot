@@ -16,7 +16,7 @@ def create_level1(world: World) -> None:
     # Clear the world before creating the level
     # Outer borders
     create_wall(world, 100, 900, 800, 2)
-    create_wall(world, 900, 100, 2, 800)
+    create_wall(world, 900, 100, 100, 800)
     create_wall(world, 100, 100, 800, 2)
     create_wall(world, 100, 100, 2, 800)
 
@@ -32,7 +32,7 @@ def create_level1(world: World) -> None:
     create_wall(world, 400, 400, 200, 2)
 
     # Ball
-    create_ball(world, 200, 800, dx=0, dy=0)
+    create_ball(world, 200, 800, dx=5, dy=0)
 
     # Hole
     create_hole(world, 500, 500)
