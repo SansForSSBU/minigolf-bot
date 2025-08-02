@@ -16,17 +16,16 @@ def detect_collisions(world: World) -> list[CollisionEvent]:
 
     for i, eid1 in enumerate(entities):
         pos1 = world.get(Position, eid1)
-        col1 = world.get(Collider, eid1)
+        col1 = world.get(Collider, eid1).shape
         rect1 = pygame.Rect(pos1.x, pos1.y, col1.width, col1.height)
 
         for eid2 in entities[i + 1 :]:
             pos2 = world.get(Position, eid2)
-            col2 = world.get(Collider, eid2)
+            col2 = world.get(Collider, eid2).shape
             rect2 = pygame.Rect(pos2.x, pos2.y, col2.width, col2.height)
 
             if rect1.colliderect(rect2):
                 events.append(CollisionEvent(a=eid1, b=eid2))
-
     return events
 
 

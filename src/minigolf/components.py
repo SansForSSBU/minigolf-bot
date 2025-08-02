@@ -1,4 +1,12 @@
 from pydantic import BaseModel
+from typing import Literal
+
+
+class Shape(BaseModel):
+    type: Literal["rect", "circle"]
+    width: int | None = None
+    height: int | None = None
+    radius: int | None = None
 
 
 class Position(BaseModel):
@@ -12,8 +20,7 @@ class Velocity(BaseModel):
 
 
 class Collider(BaseModel):
-    width: int
-    height: int
+    shape: Shape
 
 
 class PhysicsBody(BaseModel):
@@ -24,3 +31,4 @@ class PhysicsBody(BaseModel):
 
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
+    shape: Shape
