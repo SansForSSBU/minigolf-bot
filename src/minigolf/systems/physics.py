@@ -17,21 +17,24 @@ class PhysicsSpace:
                 body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
                 body.mass = 10
                 body.moment = 1
-                body.velocity = (-100, -200)
+                body.velocity = (vel.dx, vel.dy)
             else:
                 body = pymunk.Body(body_type=pymunk.Body.STATIC)
             width = col.shape.width
             height = col.shape.height
             body.position = (pos.x + width / 2, pos.y + height / 2)
             shape = pymunk.Poly.create_box(body, (width, height))
+            shape.elasticity = 1
+            shape.friction = 0
             self.space.add(body, shape)
             self.eid_to_body[eid] = body  # Store mapping
 
         pass
 
     # Steps the simulation. All positions are updated automatically.
-    def step(self, timestep=1 / 60):
-        self.space.step(timestep)
+    def step(self, timestep=1 / 60, substeps=50):
+        for _ in range(substeps):
+            self.space.step(timestep / substeps)
         # Sync Pymunk body positions back to ECS
         for eid, body in self.eid_to_body.items():
             pos = self.world.get(Position, eid)

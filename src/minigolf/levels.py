@@ -32,7 +32,7 @@ def create_level1(world: World) -> None:
     create_wall(world, 400, 400, 200, 2)
 
     # Ball
-    create_ball(world, 200, 800, dx=5, dy=0)
+    create_ball(world, 200, 800, dx=-1000, dy=-1000)
 
     # Hole
     create_hole(world, 500, 500)

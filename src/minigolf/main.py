@@ -32,7 +32,10 @@ def main_loop(world: World) -> None:
 
         physics_system.step()
         render_system(world, screen)
-
+        font = pygame.font.SysFont(None, 30)
+        fps_text = font.render(f"FPS: {clock.get_fps():.1f}", True, (255, 255, 0))
+        screen.blit(fps_text, (10, 10))
+        pygame.display.flip()
         clock.tick(60)
 
 
