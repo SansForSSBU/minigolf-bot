@@ -34,14 +34,8 @@ class PhysicsObject:
         body = pymunk.Body(body_type=body_type)
 
         if is_dynamic:
-            if bodydef is None:
-                raise ValueError(
-                    "PhysicsBody component is missing for dynamic entities."
-                )
             body.mass = bodydef.mass
             body.moment = float("inf")
-            if vel is None:
-                raise ValueError("Velocity component is missing for dynamic entities.")
             body.velocity = (vel.dx, vel.dy)
 
         width, height = col.shape.width, col.shape.height
