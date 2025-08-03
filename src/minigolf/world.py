@@ -1,11 +1,10 @@
 import json
-from collections import defaultdict
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 from pydantic import BaseModel
 
 from minigolf import components
-from minigolf.components import Entity
+from minigolf.entity import Entity
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -13,39 +12,46 @@ T = TypeVar("T", bound=BaseModel)
 class World:
     def __init__(self):
         self._next_id: int = 0
-        self.entities: set[int] = set()
-        self.components: defaultdict[type[BaseModel], dict[int, BaseModel]] = (
-            defaultdict(dict)
-        )
+        self.entities: dict[int, Entity] = {}
 
-    def create_entity(self) -> int:
-        eid: int = self._next_id
+    def add_entity(self, entity: Entity) -> int:
+        """
+        Add an entity to the world and return its ID.
+        """
+        eid = self._next_id
         self._next_id += 1
-        self.entities.add(eid)
+        entity.id = eid
+        self.entities[eid] = entity
         return eid
 
-    def get_entity(self, eid) -> Entity:
-        return Entity.from_eid(self, eid)
+    def create_entity(self) -> Entity:
+        eid: int = self._next_id
+        self._next_id += 1
+        entity = Entity()
+        self.entities[eid] = entity
+        return entity
 
-    def get(self, component_type: type[T], eid: int) -> T | None:
-        return cast(T | None, self.components[component_type].get(eid))
+    def get_entity(self, eid: int) -> Entity:
+        return self.entities[eid]
 
-    def all_with(self, *types: type[BaseModel]) -> list[int]:
+    def all_with(self, *types: type[BaseModel]) -> list[Entity]:
         return [
-            eid
-            for eid in self.entities
-            if all(eid in self.components[t] for t in types)
+            e for e in self.entities.values() if all(t in e.components for t in types)
         ]
 
     def to_json_dict(self) -> dict[str, Any]:
+        out: dict[str, dict[str, Any]] = {}
+
+        # Collect all components by type
+        for entity in self.entities.values():
+            for comp_type, comp in entity.components.items():
+                if comp_type.__name__ not in out:
+                    out[comp_type.__name__] = {}
+                out[comp_type.__name__][str(entity.id)] = comp.model_dump()
+
         return {
-            "entities": list(self.entities),
-            "components": {
-                comp_type.__name__: {
-                    str(eid): comp.model_dump() for eid, comp in comps.items()
-                }
-                for comp_type, comps in self.components.items()
-            },
+            "entities": list(self.entities.keys()),
+            "components": out,
         }
 
     def to_json(self, path: str) -> None:
@@ -61,14 +67,17 @@ class World:
     @classmethod
     def from_json_dict(cls, data: dict[str, Any]) -> "World":
         world = cls()
-        world.entities = set(map(int, data["entities"]))
 
-        # Build a component registry dynamically
         component_classes: dict[str, type[BaseModel]] = {
             name: obj
             for name, obj in vars(components).items()
             if isinstance(obj, type) and issubclass(obj, BaseModel)
         }
+
+        for eid_str in data["entities"]:
+            eid = int(eid_str)
+            entity = Entity(eid, world)
+            world.entities[eid] = entity
 
         for comp_name, eid_map in data["components"].items():
             comp_cls = component_classes.get(comp_name)
@@ -76,6 +85,7 @@ class World:
                 raise ValueError(f"Unknown component type: {comp_name}")
             for eid_str, comp_data in eid_map.items():
                 eid = int(eid_str)
-                world.components[comp_cls][eid] = comp_cls(**comp_data)
+                component = comp_cls(**comp_data)
+                world.entities[eid].add(component)
 
         return world

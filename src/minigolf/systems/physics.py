@@ -1,19 +1,21 @@
-from minigolf.components import Position, Collider, Entity
 import pymunk
+
+from minigolf.entity import Entity, PhysicsObject
+from minigolf.world import World
 
 
 class PhysicsSpace:
-    def __init__(self, world):
+    def __init__(self, world: World):
         self.world = world
-        self.space = pymunk.Space(world)
+        self.space = pymunk.Space()
         self.eid_to_body = {}
 
     def populate(self):
-        for eid in self.world.all_with(Position, Collider):
-            entity = self.world.get_entity(eid)
-            body, shape = entity.to_pymunk()
-            self.space.add(body, shape)
-            self.eid_to_body[eid] = body  # Store mapping
+        for entity in self.world.entities.values():
+            body: PhysicsObject | None = PhysicsObject.from_entity(entity)
+            if body:
+                body.add_to_space(self.space)
+                self.eid_to_body[entity.id] = body.body
 
     def step(self, timestep=1 / 60, substeps=50):
         for _ in range(substeps):
