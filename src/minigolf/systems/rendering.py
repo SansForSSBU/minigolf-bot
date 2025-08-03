@@ -24,9 +24,8 @@ def draw_bg(screen) -> None:
     screen.fill((30, 30, 30))
 
 
-def render_objects(screen, world) -> None:
-    for eid in world.all_with(Position, Renderable):
-        entity = world.get_entity(eid)
+def render_objects(screen, world: World) -> None:
+    for entity in world.all_with(Position, Renderable):
         render_entity(screen, entity)
 
 

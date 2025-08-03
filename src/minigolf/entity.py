@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, cast
 
 import pymunk
 from pydantic import BaseModel
@@ -11,16 +11,75 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound=BaseModel)
 
 
+class PhysicsObject:
+    def __init__(self, entity: "Entity", body: pymunk.Body, shape: pymunk.Shape):
+        self.entity = entity
+        self.body = body
+        self.shape = shape
+
+    @classmethod
+    def from_entity(cls, entity: "Entity") -> "PhysicsObject | None":
+        pos = entity.get(Position)
+        col = entity.get(Collider)
+        vel = entity.get(Velocity)
+        bodydef = entity.get(PhysicsBody)
+
+        if not (pos and col):
+            return None
+
+        if col.shape.type != "rect":
+            raise NotImplementedError("Only rect colliders are supported for now.")
+
+        is_dynamic = vel is not None and bodydef is not None
+
+        body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
+        body = pymunk.Body(body_type=body_type)
+
+        if is_dynamic:
+            if bodydef is None:
+                raise ValueError(
+                    "PhysicsBody component is missing for dynamic entities."
+                )
+            body.mass = bodydef.mass
+            body.moment = float("inf")
+            if vel is None:
+                raise ValueError("Velocity component is missing for dynamic entities.")
+            body.velocity = (vel.dx, vel.dy)
+
+        width, height = col.shape.width, col.shape.height
+        if width is None or height is None:
+            raise ValueError("Collider shape missing width/height")
+
+        # Centre body using shape
+        body.position = (pos.x + width / 2, pos.y + height / 2)
+
+        shape = pymunk.Poly.create_box(body, (width, height))
+        shape.elasticity = 1
+        shape.friction = 0
+
+        return cls(entity, body, shape)
+
+    def add_to_space(self, space: pymunk.Space):
+        space.add(self.body, self.shape)
+
+    def sync_to_entity(self):
+        self.entity.sync_with_pymunk_body(self.body)
+
+
 class Entity:
     def __init__(self, eid: int, world: "World"):
         self.id = eid
+        self.components: dict[type[BaseModel], BaseModel] = {}
         self._world = world
 
-    def get(self, component_type: type[T]) -> T | None:
-        return self._world.get(component_type, self.id)
+    def add(self, component: BaseModel) -> None:
+        self.components[type(component)] = component
+
+    def get(self, cls: type[T]) -> T | None:
+        return cast(T | None, self.components.get(cls))
 
     def has(self, component_type: type[BaseModel]) -> bool:
-        return self.id in self._world.components[component_type]
+        return component_type in self.components
 
     def to_pymunk_position(self):
         pos = self.get(Position)
@@ -28,35 +87,6 @@ class Entity:
         if not (pos and col):
             return None
         return (pos.x + col.shape.width / 2, pos.y + col.shape.height / 2)
-
-    def to_pymunk(self):
-        pos = self.get(Position)
-        col = self.get(Collider)
-        vel = self.get(Velocity)
-        bodydef = self.get(PhysicsBody)
-
-        if not (pos and col):
-            return None
-
-        if col.shape.type != "rect":
-            raise NotImplementedError
-
-        if vel and bodydef:
-            body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-            body.mass = bodydef.mass
-            body.moment = float("inf")
-            body.velocity = (vel.dx, vel.dy)
-        else:
-            body = pymunk.Body(body_type=pymunk.Body.STATIC)
-
-        width, height = col.shape.width, col.shape.height
-        if width is None or height is None:
-            raise ValueError("Collider shape missing width/height")
-        body.position = self.to_pymunk_position()
-        shape = pymunk.Poly.create_box(body, (width, height))
-        shape.elasticity = 1
-        shape.friction = 0
-        return body, shape
 
     def from_pymunk_position(self, pos):
         col = self.get(Collider)
