@@ -43,7 +43,7 @@ class PhysicsObject:
             raise ValueError("Collider shape missing width/height")
 
         # Centre body using shape
-        body.position = (pos.x + width / 2, pos.y + height / 2)
+        body.position = entity.to_pymunk_position()
 
         shape = pymunk.Poly.create_box(body, (width, height))
         shape.elasticity = 1

@@ -9,13 +9,12 @@ def render_entity(screen: pygame.Surface, entity: Entity) -> None:
     renderable = entity.get(Renderable)
     if renderable and renderable.shape.type == "rect":
         pos: Position | None = entity.get(Position)
-        render = entity.get(Renderable)
-        if not (pos and render):
+        if not (pos and renderable):
             return
-        rect = render.shape.to_pygame_shape(pos)
+        rect = renderable.shape.to_pygame_shape(pos)
         if rect is None:
             return
-        pygame.draw.rect(surface=screen, color=render.colour, rect=rect)
+        pygame.draw.rect(surface=screen, color=renderable.colour, rect=rect)
     else:
         raise NotImplementedError
 
