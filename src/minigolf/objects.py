@@ -7,12 +7,10 @@ from minigolf.components import (
     Velocity,
 )
 from minigolf.entity import Entity
-from minigolf.world import World
 
 
 class EntityBuilder:
-    def __init__(self, world: World):
-        self.world = world
+    def __init__(self):
         self.components: list[object] = []
 
     def ball(self, x: float, y: float) -> "EntityBuilder":
@@ -81,18 +79,18 @@ class EntityBuilder:
         return self
 
     def build(self) -> Entity:
-        entity = self.world.create_entity()
+        entity = Entity()
         for c in self.components:
             entity.add(c)
         self.components.clear()
         return entity
 
 
-def spawn(world: World) -> EntityBuilder:
+def spawn() -> EntityBuilder:
     """
-    Start building a new entity in the given world.
+    Start building a new entity.
 
     Usage:
-        spawn(world).ball(x=100, y=200).velocity(dx=5, dy=5).build()
+        world.add_entity(spawn().ball(x=100, y=200).velocity(dx=5, dy=5).build())
     """
-    return EntityBuilder(world)
+    return EntityBuilder()

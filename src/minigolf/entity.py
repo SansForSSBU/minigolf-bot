@@ -1,12 +1,10 @@
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TypeVar, cast
 
 import pymunk
 from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
 
-if TYPE_CHECKING:
-    from minigolf.world import World
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -67,10 +65,9 @@ class PhysicsObject:
 
 
 class Entity:
-    def __init__(self, eid: int, world: "World"):
-        self.id = eid
+    def __init__(self):
+        self.id: int | None = None
         self.components: dict[type[BaseModel], BaseModel] = {}
-        self._world = world
 
     def add(self, component: BaseModel) -> None:
         self.components[type(component)] = component

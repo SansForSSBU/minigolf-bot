@@ -14,10 +14,20 @@ class World:
         self._next_id: int = 0
         self.entities: dict[int, Entity] = {}
 
+    def add_entity(self, entity: Entity) -> int:
+        """
+        Add an entity to the world and return its ID.
+        """
+        eid = self._next_id
+        self._next_id += 1
+        entity.id = eid
+        self.entities[eid] = entity
+        return eid
+
     def create_entity(self) -> Entity:
         eid: int = self._next_id
         self._next_id += 1
-        entity = Entity(eid, self)
+        entity = Entity()
         self.entities[eid] = entity
         return entity
 
