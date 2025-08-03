@@ -84,13 +84,3 @@ class EntityBuilder:
             entity.add(c)
         self.components.clear()
         return entity
-
-
-def spawn() -> EntityBuilder:
-    """
-    Start building a new entity.
-
-    Usage:
-        world.add_entity(spawn().ball(x=100, y=200).velocity(dx=5, dy=5).build())
-    """
-    return EntityBuilder()

@@ -1,12 +1,12 @@
 from pytest import approx
 
 from minigolf.components import Collider, PhysicsBody, Position, Renderable, Velocity
-from minigolf.objects import spawn
+from minigolf.objects import EntityBuilder
 from minigolf.world import World
 
 
 def test_ball_components():
-    entity = spawn().ball(x=100, y=200).velocity(dx=50, dy=-10).build()
+    entity = EntityBuilder().ball(x=100, y=200).velocity(dx=50, dy=-10).build()
 
     assert isinstance(entity.get(Position), Position)
     assert entity.get(Position).x == 100
@@ -21,10 +21,10 @@ def test_ball_components():
     assert isinstance(entity.get(Renderable), Renderable)
 
 
-def test_bulk_spawn_isolated():
+def test_bulk_EntityBuilder_isolated():
     world = World()
     for i in range(10):
-        e = spawn().ball(x=i * 10, y=0).build()
+        e = EntityBuilder().ball(x=i * 10, y=0).build()
         world.add_entity(e)
         assert e.get(Position).x == i * 10
         assert e.get(Velocity) is not None
@@ -32,7 +32,7 @@ def test_bulk_spawn_isolated():
 
 def test_wall_is_static():
     world = World()
-    entity = spawn().wall(x=0, y=0, width=100, height=10).build()
+    entity = EntityBuilder().wall(x=0, y=0, width=100, height=10).build()
     world.add_entity(entity)
 
     assert isinstance(entity.get(Position), Position)
@@ -42,7 +42,7 @@ def test_wall_is_static():
 
 def test_hole_is_static_and_separate():
     world = World()
-    s = spawn()
+    s = EntityBuilder()
 
     ball = s.ball(x=50, y=50).velocity(dx=10, dy=0).build()
     hole = s.hole(x=300, y=300).build()
@@ -57,7 +57,7 @@ def test_hole_is_static_and_separate():
 
 def test_reuse_safe_after_build():
     world = World()
-    s = spawn()
+    s = EntityBuilder()
 
     world.add_entity(s.ball(x=10, y=10).velocity(dx=1, dy=2).build())
     entity = s.hole(x=500, y=500).build()
@@ -69,7 +69,7 @@ def test_reuse_safe_after_build():
 
 def test_physics_applies_velocity():
     world = World()
-    entity = spawn().ball(x=0, y=0).velocity(dx=5, dy=0).build()
+    entity = EntityBuilder().ball(x=0, y=0).velocity(dx=5, dy=0).build()
     world.add_entity(entity)
 
     from minigolf.systems.physics import PhysicsSpace
@@ -84,8 +84,8 @@ def test_physics_applies_velocity():
 
 def test_ball_hits_wall_and_stops():
     world = World()
-    ball = spawn().ball(x=100, y=100).velocity(dx=100, dy=0).build()
-    wall = spawn().wall(x=200, y=100, width=20, height=20).build()
+    ball = EntityBuilder().ball(x=100, y=100).velocity(dx=100, dy=0).build()
+    wall = EntityBuilder().wall(x=200, y=100, width=20, height=20).build()
 
     world.add_entity(ball)
     world.add_entity(wall)
@@ -102,7 +102,7 @@ def test_ball_hits_wall_and_stops():
 
 def test_builder_clears_between_builds():
     world = World()
-    s = spawn()
+    s = EntityBuilder()
 
     world.add_entity(s.ball(x=0, y=0).velocity(dx=5, dy=0).build())
     hole_entity = s.hole(x=100, y=100).build()
@@ -114,7 +114,7 @@ def test_builder_clears_between_builds():
 
 
 def test_shape_matches_between_components():
-    e = spawn().ball(x=0, y=0).build()
+    e = EntityBuilder().ball(x=0, y=0).build()
 
     collider = e.get(Collider)
     renderable = e.get(Renderable)
@@ -123,5 +123,5 @@ def test_shape_matches_between_components():
 
 
 def test_custom_ball_colour():
-    e = spawn().ball(x=0, y=0).colour((123, 45, 67)).build()
+    e = EntityBuilder().ball(x=0, y=0).colour((123, 45, 67)).build()
     assert e.get(Renderable).colour == (123, 45, 67)
