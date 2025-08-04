@@ -23,7 +23,6 @@ class EntityBuilder:
             y (float): The y-coordinate of the ball's position.
         """
         shape = Circle(radius=5)
-        # shape = Shape(type="circle", radius=5)
         self.components += [
             Position(x=x, y=y),
             Velocity(dx=0, dy=0),
