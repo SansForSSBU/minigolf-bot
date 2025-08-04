@@ -3,7 +3,7 @@ from typing import TypeVar, cast
 import pymunk
 from pydantic import BaseModel
 
-from minigolf.components import Collider, PhysicsBody, Position, Velocity, Rect, Circle
+from minigolf.components import Collider, PhysicsBody, Position, Velocity, Rect
 
 
 T = TypeVar("T", bound=BaseModel)
@@ -32,20 +32,7 @@ class PhysicsObject:
             body.velocity = vel.dx, vel.dy
 
         body.position = entity.to_pymunk_position()
-        if isinstance(col.shape, Rect):
-            width, height = col.shape.width, col.shape.height
-            if width is None or height is None:
-                raise ValueError("Rectangle shape missing width/height")
-            shape = pymunk.Poly.create_box(body, (width, height))
-
-        elif isinstance(col.shape, Circle):
-            radius = col.shape.radius
-            if radius is None:
-                raise ValueError("Circle shape missing radius")
-            shape = pymunk.Circle(body, radius)
-
-        else:
-            raise NotImplementedError
+        shape = col.shape.to_pymunk(body)
 
         shape.elasticity = 1
         shape.friction = 0

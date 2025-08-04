@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import pygame
+import pymunk
 from pydantic import BaseModel
 
 
@@ -26,6 +27,10 @@ class Shape(BaseModel, ABC):
     def draw_at(self, screen, pos, colour) -> None:
         pass
 
+    @abstractmethod
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly:
+        pass
+
 
 class Rect(Shape):
     width: float
@@ -41,6 +46,9 @@ class Rect(Shape):
         rect = pygame.Rect(pos.x, pos.y, self.width, self.height)
         pygame.draw.rect(surface=screen, color=colour, rect=rect)
 
+    def to_pymunk(self, body: pymunk.Body):
+        return pymunk.Poly.create_box(body, (self.width, self.height))
+
 
 class Circle(Shape):
     radius: float
@@ -53,6 +61,9 @@ class Circle(Shape):
 
     def draw_at(self, screen, pos, colour) -> None:
         pygame.draw.circle(screen, colour, (pos.x, pos.y), self.radius)
+
+    def to_pymunk(self, body: pymunk.Body):
+        return pymunk.Circle(body, self.radius)
 
 
 class Collider(BaseModel):

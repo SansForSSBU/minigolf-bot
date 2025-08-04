@@ -12,22 +12,6 @@ def render_entity(screen: pygame.Surface, entity: Entity) -> None:
         return
 
     renderable.shape.draw_at(screen, pos, renderable.colour)
-    """
-    if renderable and renderable.shape.type == "rect":
-        rect = pygame.Rect(pos.x, pos.y, renderable.shape.width, renderable.shape.height)
-        if rect is None:
-            return
-        pygame.draw.rect(surface=screen, color=renderable.colour, rect=rect)
-    elif renderable.shape.type == "circle":
-        pygame.draw.circle(
-            surface=screen,
-            color=renderable.colour,
-            center=(pos.x, pos.y),
-            radius=renderable.shape.radius,
-        )
-    else:
-        raise NotImplementedError
-    """
 
 
 def draw_bg(screen) -> None:
