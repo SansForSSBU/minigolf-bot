@@ -8,6 +8,7 @@ from loguru import logger
 from minigolf.levels import create_level1
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.rendering import render_system
+from minigolf.systems.control import control_system
 from minigolf.world import World
 
 
@@ -26,6 +27,7 @@ def main_loop(world: World) -> None:
                 sys.exit()
 
         physics_system.step()
+        control_system(world, physics_system)
         render_system(world, screen)
         pygame.display.flip()
         clock.tick(60)

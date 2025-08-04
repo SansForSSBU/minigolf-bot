@@ -31,6 +31,12 @@ class World:
         self.entities[eid] = entity
         return entity
 
+    def get_balls(self):
+        # TODO: The ball entity should have some unique tag associated with it but this will work for now
+        dynamic_bodies = self.all_with(components.PhysicsBody)
+        return dynamic_bodies
+        pass
+
     def get_entity(self, eid: int) -> Entity:
         return self.entities[eid]
 
