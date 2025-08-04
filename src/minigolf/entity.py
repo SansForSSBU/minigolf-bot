@@ -3,7 +3,7 @@ from typing import TypeVar, cast
 import pymunk
 from pydantic import BaseModel
 
-from minigolf.components import Collider, PhysicsBody, Position, Velocity
+from minigolf.components import Collider, PhysicsBody, Position, Velocity, Rect, Circle
 
 
 T = TypeVar("T", bound=BaseModel)
@@ -32,13 +32,13 @@ class PhysicsObject:
             body.velocity = vel.dx, vel.dy
 
         body.position = entity.to_pymunk_position()
-        if col.shape.type == "rect":
+        if isinstance(col.shape, Rect):
             width, height = col.shape.width, col.shape.height
             if width is None or height is None:
                 raise ValueError("Rectangle shape missing width/height")
             shape = pymunk.Poly.create_box(body, (width, height))
 
-        elif col.shape.type == "circle":
+        elif isinstance(col.shape, Circle):
             radius = col.shape.radius
             if radius is None:
                 raise ValueError("Circle shape missing radius")
@@ -78,12 +78,8 @@ class Entity:
         col = self.get(Collider)
         if not (pos and col):
             return None
-        if col.shape.type == "rect":
-            return (pos.x + col.shape.width / 2, pos.y + col.shape.height / 2)
-        elif col.shape.type == "circle":
-            return (pos.x, pos.y)
-        else:
-            raise NotImplementedError
+        offset = col.shape.pymunk_offset()
+        return (pos.x + offset[0], pos.y + offset[1])
 
     def from_pymunk_position(self, pos: tuple[int, int]) -> Position:
         # TODO: This should operate on Shape and be a utility method.
@@ -91,7 +87,7 @@ class Entity:
         bx, by = pos
         if not col:
             return None
-        if col.shape.type == "rect":
+        if isinstance(col.shape, Rect):
             return Position(
                 x=bx - (col.shape.width / 2),
                 y=by - (col.shape.height / 2),

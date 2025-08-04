@@ -1,5 +1,4 @@
-from typing import Literal
-
+from abc import ABC, abstractmethod
 import pygame
 from pydantic import BaseModel
 
@@ -14,17 +13,46 @@ class Velocity(BaseModel):
     dy: float
 
 
-class Shape(BaseModel):
-    type: Literal["rect", "circle"]
-    width: int | None = None
-    height: int | None = None
-    radius: int | None = None
+class Shape(BaseModel, ABC):
+    @abstractmethod
+    def pymunk_offset(self) -> tuple[float, float]:
+        pass
 
-    def to_pygame_shape(self, pos: Position):
-        if self.type == "rect":
-            return pygame.Rect(pos.x, pos.y, self.width, self.height)
-        elif self.type == "circle":
-            raise NotImplementedError
+    @abstractmethod
+    def pygame_offset(self) -> tuple[float, float]:
+        pass
+
+    @abstractmethod
+    def draw_at(self, screen, pos, colour) -> None:
+        pass
+
+
+class Rect(Shape):
+    width: float
+    height: float
+
+    def pymunk_offset(self) -> tuple[float, float]:
+        return (self.width / 2, self.height / 2)
+
+    def pygame_offset(self) -> tuple[float, float]:
+        return (0, 0)
+
+    def draw_at(self, screen, pos, colour) -> None:
+        rect = pygame.Rect(pos.x, pos.y, self.width, self.height)
+        pygame.draw.rect(surface=screen, color=colour, rect=rect)
+
+
+class Circle(Shape):
+    radius: float
+
+    def pymunk_offset(self) -> tuple[float, float]:
+        return (0, 0)
+
+    def pygame_offset(self) -> tuple[float, float]:
+        return (0, 0)
+
+    def draw_at(self, screen, pos, colour) -> None:
+        pygame.draw.circle(screen, colour, (pos.x, pos.y), self.radius)
 
 
 class Collider(BaseModel):

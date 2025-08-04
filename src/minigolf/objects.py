@@ -3,7 +3,8 @@ from minigolf.components import (
     PhysicsBody,
     Position,
     Renderable,
-    Shape,
+    Rect,
+    Circle,
     Velocity,
 )
 from minigolf.entity import Entity
@@ -21,7 +22,7 @@ class EntityBuilder:
             x (float): The x-coordinate of the ball's position.
             y (float): The y-coordinate of the ball's position.
         """
-        shape = Shape(type="circle", radius=5)
+        shape = Circle(radius=5)
         # shape = Shape(type="circle", radius=5)
         self.components += [
             Position(x=x, y=y),
@@ -42,7 +43,7 @@ class EntityBuilder:
             width (int): The width of the wall.
             height (int): The height of the wall.
         """
-        shape = Shape(type="rect", width=width, height=height)
+        shape = Rect(width=width, height=height)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
@@ -60,7 +61,7 @@ class EntityBuilder:
         Returns:
             int: The entity ID of the created hole.
         """
-        shape = Shape(type="circle", radius=10)
+        shape = Circle(radius=10)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
