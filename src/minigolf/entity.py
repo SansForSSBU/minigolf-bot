@@ -3,7 +3,7 @@ from typing import TypeVar, cast
 import pymunk
 from pydantic import BaseModel
 
-from minigolf.components import Collider, PhysicsBody, Position, Velocity, Rect
+from minigolf.components import Collider, PhysicsBody, Position, Velocity
 
 
 T = TypeVar("T", bound=BaseModel)
@@ -74,13 +74,11 @@ class Entity:
         bx, by = pos
         if not col:
             return None
-        if isinstance(col.shape, Rect):
-            return Position(
-                x=bx - (col.shape.width / 2),
-                y=by - (col.shape.height / 2),
-            )
-        else:
-            return Position(x=bx, y=by)
+        offset = col.shape.pymunk_offset()
+        return Position(
+            x=bx - offset[0],
+            y=by - offset[1],
+        )
 
     def sync_with_pymunk_body(self, body) -> None:
         pos = self.get(Position)
