@@ -24,7 +24,12 @@ class PhysicsObject:
         if not (pos and col and bodydef):
             return None
         is_dynamic = vel is not None and bodydef is not None
-        body = bodydef.to_pymunk(anchored=is_dynamic)
+        anchored = not is_dynamic
+        body = bodydef.to_pymunk(anchored=anchored)
+        if is_dynamic:
+            body.mass = bodydef.mass
+            body.moment = float("inf")
+            body.velocity = (vel.dx, vel.dy)
         # Centre body using shape
         body.position = entity.to_pymunk_position()
         if col.shape.type == "rect":
@@ -41,6 +46,7 @@ class PhysicsObject:
 
         else:
             raise NotImplementedError
+
         shape.elasticity = 1
         shape.friction = 0
 

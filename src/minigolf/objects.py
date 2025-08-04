@@ -21,10 +21,11 @@ class EntityBuilder:
             x (float): The x-coordinate of the ball's position.
             y (float): The y-coordinate of the ball's position.
         """
-        shape = Shape(type="circle", radius=5)
+        shape = Shape(type="rect", width=10, height=10)
+        # shape = Shape(type="circle", radius=5)
         self.components += [
             Position(x=x, y=y),
-            Velocity(dx=100, dy=100),
+            Velocity(dx=0, dy=0),
             PhysicsBody(mass=1.0, bounciness=0.9, friction=0.01),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),
