@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import pygame
 import pymunk
 from pydantic import BaseModel
+from minigolf.utils import add_tuples
 
 
 class Position(BaseModel):
@@ -43,7 +44,8 @@ class Rect(Shape):
         return (0, 0)
 
     def draw_at(self, screen, pos, colour) -> None:
-        rect = pygame.Rect(pos.x, pos.y, self.width, self.height)
+        draw_pos = add_tuples((pos.x, pos.y), self.pygame_offset())
+        rect = pygame.Rect(draw_pos[0], draw_pos[1], self.width, self.height)
         pygame.draw.rect(surface=screen, color=colour, rect=rect)
 
     def to_pymunk(self, body: pymunk.Body):
@@ -60,7 +62,8 @@ class Circle(Shape):
         return (0, 0)
 
     def draw_at(self, screen, pos, colour) -> None:
-        pygame.draw.circle(screen, colour, (pos.x, pos.y), self.radius)
+        draw_pos = add_tuples((pos.x, pos.y), self.pygame_offset())
+        pygame.draw.circle(screen, colour, draw_pos, self.radius)
 
     def to_pymunk(self, body: pymunk.Body):
         return pymunk.Circle(body, self.radius)
