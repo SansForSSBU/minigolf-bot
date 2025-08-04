@@ -8,11 +8,12 @@ from minigolf.components import (
     Velocity,
 )
 from minigolf.entity import Entity
+from pydantic import BaseModel
 
 
 class EntityBuilder:
     def __init__(self):
-        self.components: list[object] = []
+        self.components: list[BaseModel] = []
 
     def ball(self, x: float, y: float) -> "EntityBuilder":
         """

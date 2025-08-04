@@ -29,7 +29,7 @@ class Shape(BaseModel, ABC):
         pass
 
     @abstractmethod
-    def to_pymunk(self, body: pymunk.Body) -> object:
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly | pymunk.Circle:
         pass
 
 
