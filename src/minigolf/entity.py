@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
 from minigolf.utils import from_pymunk_position, to_pymunk_position
+from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -33,8 +34,9 @@ class PhysicsObject:
         body.position = to_pymunk_position(col.shape, pos)
         shape = col.shape.to_pymunk(body)
 
-        shape.elasticity = 1
-        shape.friction = 0
+        shape.elasticity = DEFAULT_ELASTICITY
+        shape.friction = DEFAULT_WALL_FRICTION
+        shape.mass = body.mass
 
         return cls(entity, body, shape)
 

@@ -2,12 +2,14 @@ import pymunk
 
 from minigolf.entity import Entity, PhysicsObject
 from minigolf.world import World
+from minigolf.constants import DEFAULT_FLOOR_FRICTION
 
 
 class PhysicsSpace:
     def __init__(self, world: World):
         self.world = world
         self.space = pymunk.Space()
+        self.space.damping = DEFAULT_FLOOR_FRICTION
         self.eid_to_body = {}
 
     def populate(self):

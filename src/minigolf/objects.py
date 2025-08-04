@@ -9,6 +9,7 @@ from minigolf.components import (
 )
 from minigolf.entity import Entity
 from pydantic import BaseModel
+from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 
 
 class EntityBuilder:
@@ -27,7 +28,9 @@ class EntityBuilder:
         self.components += [
             Position(x=x, y=y),
             Velocity(dx=0, dy=0),
-            PhysicsBody(mass=1.0, bounciness=0.9, friction=0.01),
+            PhysicsBody(
+                mass=1.0, bounciness=DEFAULT_ELASTICITY, friction=DEFAULT_WALL_FRICTION
+            ),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),
         ]
