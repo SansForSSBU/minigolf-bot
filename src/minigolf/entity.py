@@ -4,7 +4,7 @@ import pymunk
 from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
-
+from minigolf.utils import from_pymunk_position, to_pymunk_position
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -31,7 +31,7 @@ class PhysicsObject:
             body.moment = float("inf")
             body.velocity = vel.dx, vel.dy
 
-        body.position = entity.to_pymunk_position()
+        body.position = to_pymunk_position(col.shape, pos)
         shape = col.shape.to_pymunk(body)
 
         shape.elasticity = 1
@@ -60,33 +60,10 @@ class Entity:
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components
 
-    def to_pymunk_position(self):
-        pos = self.get(Position)
-        col = self.get(Collider)
-        if not (pos and col):
-            return None
-        offset = col.shape.pymunk_offset()
-        return (pos.x + offset[0], pos.y + offset[1])
-
-    def from_pymunk_position(self, pos: tuple[int, int]) -> Position:
-        # TODO: This should operate on Shape and be a utility method.
-        col = self.get(Collider)
-        bx, by = pos
-        if not col:
-            return None
-        offset = col.shape.pymunk_offset()
-        return Position(
-            x=bx - offset[0],
-            y=by - offset[1],
-        )
-
-    def sync_with_pymunk_body(self, body) -> None:
-        pos = self.get(Position)
-        if not pos:
-            return
-        new_pos: Position = self.from_pymunk_position(body.position)
-        pos.x = new_pos.x
-        pos.y = new_pos.y
+    def sync_with_pymunk_body(self, pymunk_body) -> None:
+        assert (pos := self.get(Position)) is not None
+        assert (col := self.get(Collider)) is not None
+        pos.x, pos.y = from_pymunk_position(col.shape, pymunk_body.position)
 
     def to_pygame(self):
         raise NotImplementedError

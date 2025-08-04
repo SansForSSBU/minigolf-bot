@@ -29,7 +29,7 @@ class Shape(BaseModel, ABC):
         pass
 
     @abstractmethod
-    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly:
+    def to_pymunk(self, body: pymunk.Body) -> object:
         pass
 
 
@@ -48,7 +48,7 @@ class Rect(Shape):
         rect = pygame.Rect(draw_pos[0], draw_pos[1], self.width, self.height)
         pygame.draw.rect(surface=screen, color=colour, rect=rect)
 
-    def to_pymunk(self, body: pymunk.Body):
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly:
         return pymunk.Poly.create_box(body, (self.width, self.height))
 
 
@@ -65,7 +65,7 @@ class Circle(Shape):
         draw_pos = add_tuples((pos.x, pos.y), self.pygame_offset())
         pygame.draw.circle(screen, colour, draw_pos, self.radius)
 
-    def to_pymunk(self, body: pymunk.Body):
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Circle:
         return pymunk.Circle(body, self.radius)
 
 
