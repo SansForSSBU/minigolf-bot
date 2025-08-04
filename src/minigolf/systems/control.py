@@ -3,11 +3,10 @@ from pymunk import Vec2d
 moves = list(
     reversed(
         [
-            Vec2d(300.0, 0.0),
-            Vec2d(0.0, -300.0),
-            Vec2d(-300.0, 0.0),
-            Vec2d(0.0, 300.0),
-            Vec2d(120.0, 480.0),
+            [Vec2d(300.0, 0.0), 10000.0],
+            [Vec2d(0.0, -300.0), 10000.0],
+            [Vec2d(-300.0, 0.0), 10000.0],
+            [Vec2d(-15.0, 500.0), 10000.0],
         ]
     )
 )
@@ -24,7 +23,8 @@ def control_system(world, physics_system):
         stop_ball(pymunk_ball)
         try:
             next_move = moves.pop()
-            pymunk_ball.velocity = next_move
+            pymunk_ball.velocity = next_move[0]
+            pymunk_ball.angular_velocity = next_move[1]
         except IndexError:
             print("No moves left")
 

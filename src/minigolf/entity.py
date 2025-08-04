@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
 from minigolf.utils import from_pymunk_position, to_pymunk_position
-from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
+from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION, BALL_MOMENT
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -28,7 +28,7 @@ class PhysicsObject:
         if bodydef is not None:
             assert vel is not None
             body.mass = bodydef.mass
-            body.moment = float("inf")
+            body.moment = BALL_MOMENT
             body.velocity = vel.dx, vel.dy
 
         body.position = to_pymunk_position(col.shape, pos)
