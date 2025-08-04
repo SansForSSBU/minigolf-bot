@@ -10,6 +10,7 @@ from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.rendering import render_system
 from minigolf.systems.control import control_system
 from minigolf.world import World
+from minigolf.constants import SIMULATION_SPEED
 
 
 # Game loop runner
@@ -30,7 +31,7 @@ def main_loop(world: World) -> None:
         control_system(world, physics_system)
         render_system(world, screen)
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(60 * SIMULATION_SPEED)
 
 
 @click.command()
