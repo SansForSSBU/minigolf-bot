@@ -20,6 +20,7 @@ where = ["src"]
 
 [project.scripts]
 minigolf = "minigolf.game:cli"
+minigolf-editor = "minigolf.editor:cli"
 
 [tool.uv]
 package = true
