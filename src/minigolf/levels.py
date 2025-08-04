@@ -34,7 +34,7 @@ def create_level1(world: World) -> None:
     add(EntityBuilder().wall(400, 400, 200, 2).build())
 
     # Ball
-    add(EntityBuilder().ball(200, 800).velocity(dx=-100, dy=-100).build())
+    add(EntityBuilder().ball(200, 800).velocity(dx=-1000, dy=-1000).build())
 
     # Hole
     add(EntityBuilder().hole(500, 500).build())

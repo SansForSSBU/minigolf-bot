@@ -21,16 +21,16 @@ class PhysicsObject:
         col = entity.get(Collider)
         vel = entity.get(Velocity)
         bodydef = entity.get(PhysicsBody)
-        if not (pos and col and bodydef):
+        if not (pos and col):
             return None
         is_dynamic = vel is not None and bodydef is not None
-        anchored = not is_dynamic
-        body = bodydef.to_pymunk(anchored=anchored)
-        if is_dynamic:
+        body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
+        body = pymunk.Body(body_type=body_type)
+        if bodydef is not None:
             body.mass = bodydef.mass
             body.moment = float("inf")
-            body.velocity = (vel.dx, vel.dy)
-        # Centre body using shape
+            body.velocity = vel.dx, vel.dy
+
         body.position = entity.to_pymunk_position()
         if col.shape.type == "rect":
             width, height = col.shape.width, col.shape.height
@@ -78,10 +78,12 @@ class Entity:
         col = self.get(Collider)
         if not (pos and col):
             return None
-        if col.shape == "square":
+        if col.shape.type == "rect":
             return (pos.x + col.shape.width / 2, pos.y + col.shape.height / 2)
-        else:
+        elif col.shape.type == "circle":
             return (pos.x, pos.y)
+        else:
+            raise NotImplementedError
 
     def from_pymunk_position(self, pos: tuple[int, int]) -> Position:
         # TODO: This should operate on Shape and be a utility method.

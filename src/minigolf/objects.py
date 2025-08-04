@@ -21,7 +21,7 @@ class EntityBuilder:
             x (float): The x-coordinate of the ball's position.
             y (float): The y-coordinate of the ball's position.
         """
-        shape = Shape(type="rect", width=10, height=10)
+        shape = Shape(type="circle", radius=5)
         # shape = Shape(type="circle", radius=5)
         self.components += [
             Position(x=x, y=y),
@@ -60,7 +60,7 @@ class EntityBuilder:
         Returns:
             int: The entity ID of the created hole.
         """
-        shape = Shape(type="rect", width=20, height=20)
+        shape = Shape(type="circle", radius=10)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
