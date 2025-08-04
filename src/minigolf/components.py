@@ -1,6 +1,7 @@
 from typing import Literal
 
 import pygame
+import pymunk
 from pydantic import BaseModel
 
 
@@ -35,6 +36,17 @@ class PhysicsBody(BaseModel):
     mass: float
     bounciness: float  # restitution
     friction: float
+    # TODO: Should anchored be an attribute of this?
+
+    def to_pymunk(self, anchored) -> pymunk.Body:
+        body_type = pymunk.Body.STATIC if anchored else pymunk.Body.DYNAMIC
+        body = pymunk.Body(body_type=body_type)
+
+        if not anchored:
+            body.mass = self.mass
+            body.moment = float("inf")
+
+        return body
 
 
 class Renderable(BaseModel):

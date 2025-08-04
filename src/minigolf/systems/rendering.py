@@ -7,16 +7,21 @@ from minigolf.world import World
 
 def render_entity(screen: pygame.Surface, entity: Entity) -> None:
     renderable = entity.get(Renderable)
+    pos: Position | None = entity.get(Position)
+    if not (pos and renderable):
+        return
     if renderable and renderable.shape.type == "rect":
-        pos: Position | None = entity.get(Position)
-        if not (pos and renderable):
-            return
         rect = renderable.shape.to_pygame_shape(pos)
         if rect is None:
             return
         pygame.draw.rect(surface=screen, color=renderable.colour, rect=rect)
     else:
-        raise NotImplementedError
+        pygame.draw.circle(
+            surface=screen,
+            color=renderable.colour,
+            center=(pos.x, pos.y),
+            radius=renderable.shape.radius,
+        )
 
 
 def draw_bg(screen) -> None:

@@ -21,31 +21,26 @@ class PhysicsObject:
         col = entity.get(Collider)
         vel = entity.get(Velocity)
         bodydef = entity.get(PhysicsBody)
-
-        if not (pos and col):
+        if not (pos and col and bodydef):
             return None
-
-        if col.shape.type != "rect":
-            raise NotImplementedError("Only rect colliders are supported for now.")
-
         is_dynamic = vel is not None and bodydef is not None
-
-        body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
-        body = pymunk.Body(body_type=body_type)
-
-        if is_dynamic:
-            body.mass = bodydef.mass
-            body.moment = float("inf")
-            body.velocity = (vel.dx, vel.dy)
-
-        width, height = col.shape.width, col.shape.height
-        if width is None or height is None:
-            raise ValueError("Collider shape missing width/height")
-
+        body = bodydef.to_pymunk(anchored=is_dynamic)
         # Centre body using shape
         body.position = entity.to_pymunk_position()
+        if col.shape.type == "rect":
+            width, height = col.shape.width, col.shape.height
+            if width is None or height is None:
+                raise ValueError("Rectangle shape missing width/height")
+            shape = pymunk.Poly.create_box(body, (width, height))
 
-        shape = pymunk.Poly.create_box(body, (width, height))
+        elif col.shape.type == "circle":
+            radius = col.shape.radius
+            if radius is None:
+                raise ValueError("Circle shape missing radius")
+            shape = pymunk.Circle(body, radius)
+
+        else:
+            raise NotImplementedError
         shape.elasticity = 1
         shape.friction = 0
 
@@ -77,23 +72,30 @@ class Entity:
         col = self.get(Collider)
         if not (pos and col):
             return None
-        return (pos.x + col.shape.width / 2, pos.y + col.shape.height / 2)
+        if col.shape == "square":
+            return (pos.x + col.shape.width / 2, pos.y + col.shape.height / 2)
+        else:
+            return (pos.x, pos.y)
 
-    def from_pymunk_position(self, pos):
+    def from_pymunk_position(self, pos: tuple[int, int]) -> Position:
+        # TODO: This should operate on Shape and be a utility method.
         col = self.get(Collider)
-        if not col or col.shape.type != "rect":
-            raise NotImplementedError
         bx, by = pos
-        return Position(
-            x=bx - (col.shape.width / 2),
-            y=by - (col.shape.height / 2),
-        )
+        if not col:
+            return None
+        if col.shape.type == "rect":
+            return Position(
+                x=bx - (col.shape.width / 2),
+                y=by - (col.shape.height / 2),
+            )
+        else:
+            return Position(x=bx, y=by)
 
     def sync_with_pymunk_body(self, body) -> None:
         pos = self.get(Position)
         if not pos:
             return
-        new_pos = self.from_pymunk_position(body.position)
+        new_pos: Position = self.from_pymunk_position(body.position)
         pos.x = new_pos.x
         pos.y = new_pos.y
 
