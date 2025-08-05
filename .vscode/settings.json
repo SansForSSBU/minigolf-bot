@@ -1,8 +1,11 @@
 {
     "python.analysis.typeCheckingMode": "standard",
     "cSpell.words": [
+        "bodydef",
         "minigolf",
         "pymunk",
-        "Renderable"
+        "Renderable",
+        "substeps",
+        "timestep"
     ]
 }
