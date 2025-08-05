@@ -82,7 +82,8 @@ class World:
 
         for eid_str in data["entities"]:
             eid = int(eid_str)
-            entity = Entity(eid, world)
+            entity = Entity()
+            entity.id = eid
             world.entities[eid] = entity
 
         for comp_name, eid_map in data["components"].items():
