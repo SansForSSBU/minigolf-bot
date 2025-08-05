@@ -79,7 +79,8 @@ class World:
 
         for eid_str in data["entities"]:
             eid = int(eid_str)
-            entity = Entity(eid, world)
+            entity = Entity()
+            entity.id = eid
             world.entities[eid] = entity
 
         for comp_name, eid_map in data["components"].items():
@@ -90,5 +91,7 @@ class World:
                 eid = int(eid_str)
                 component = comp_cls(**comp_data)
                 world.entities[eid].add(component)
+
+        world._next_id = max(world.entities.keys(), default=-1) + 1
 
         return world

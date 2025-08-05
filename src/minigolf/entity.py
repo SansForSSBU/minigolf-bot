@@ -72,6 +72,10 @@ class Entity:
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components
 
+    def remove(self, component_type: type[BaseModel]) -> None:
+        if component_type in self.components:
+            del self.components[component_type]
+
     def to_pymunk_position(self):
         pos = self.get(Position)
         col = self.get(Collider)
