@@ -72,91 +72,91 @@
         "Collider": {
             "0": {
                 "shape": {
-                    "type": "Rect",
                     "width": 800.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "1": {
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 800.0
+                    "height": 800.0,
+                    "type": "Rect"
                 }
             },
             "2": {
                 "shape": {
-                    "type": "Rect",
                     "width": 800.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "3": {
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 800.0
+                    "height": 800.0,
+                    "type": "Rect"
                 }
             },
             "4": {
                 "shape": {
-                    "type": "Rect",
                     "width": 600.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "5": {
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 400.0
+                    "height": 400.0,
+                    "type": "Rect"
                 }
             },
             "6": {
                 "shape": {
-                    "type": "Rect",
                     "width": 400.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "7": {
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 300.0
+                    "height": 300.0,
+                    "type": "Rect"
                 }
             },
             "8": {
                 "shape": {
-                    "type": "Rect",
                     "width": 200.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "9": {
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 200.0
+                    "height": 200.0,
+                    "type": "Rect"
                 }
             },
             "10": {
                 "shape": {
-                    "type": "Rect",
                     "width": 200.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "11": {
                 "shape": {
-                    "type": "Circle",
-                    "radius": 5.0
+                    "radius": 5.0,
+                    "type": "Circle"
                 }
             },
             "12": {
                 "shape": {
-                    "type": "Circle",
-                    "radius": 10.0
+                    "radius": 10.0,
+                    "type": "Circle"
                 }
             }
         },
@@ -168,9 +168,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 800.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "1": {
@@ -180,9 +180,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 800.0
+                    "height": 800.0,
+                    "type": "Rect"
                 }
             },
             "2": {
@@ -192,9 +192,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 800.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "3": {
@@ -204,9 +204,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 800.0
+                    "height": 800.0,
+                    "type": "Rect"
                 }
             },
             "4": {
@@ -216,9 +216,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 600.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "5": {
@@ -228,9 +228,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 400.0
+                    "height": 400.0,
+                    "type": "Rect"
                 }
             },
             "6": {
@@ -240,9 +240,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 400.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "7": {
@@ -252,9 +252,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 300.0
+                    "height": 300.0,
+                    "type": "Rect"
                 }
             },
             "8": {
@@ -264,9 +264,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 200.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "9": {
@@ -276,9 +276,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 2.0,
-                    "height": 200.0
+                    "height": 200.0,
+                    "type": "Rect"
                 }
             },
             "10": {
@@ -288,9 +288,9 @@
                     0
                 ],
                 "shape": {
-                    "type": "Rect",
                     "width": 200.0,
-                    "height": 2.0
+                    "height": 2.0,
+                    "type": "Rect"
                 }
             },
             "11": {
@@ -300,8 +300,8 @@
                     255
                 ],
                 "shape": {
-                    "type": "Circle",
-                    "radius": 5.0
+                    "radius": 5.0,
+                    "type": "Circle"
                 }
             },
             "12": {
@@ -311,8 +311,8 @@
                     0
                 ],
                 "shape": {
-                    "type": "Circle",
-                    "radius": 10.0
+                    "radius": 10.0,
+                    "type": "Circle"
                 }
             }
         },

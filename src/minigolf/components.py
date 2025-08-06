@@ -32,6 +32,12 @@ class Shape(BaseModel, ABC):
     def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly | pymunk.Circle:
         pass
 
+    def model_dump(self, *args, **kwargs):
+        # Default: include type info for all shapes
+        data = super().model_dump(*args, **kwargs)
+        data["type"] = self.__class__.__name__
+        return data
+
 
 class Rect(Shape):
     width: float
@@ -74,10 +80,7 @@ class Collider(BaseModel):
 
     def model_dump(self, *args, **kwargs):
         data = super().model_dump(*args, **kwargs)
-        data["shape"] = {
-            "type": self.shape.__class__.__name__,
-            **self.shape.model_dump(),
-        }
+        data["shape"] = self.shape.model_dump(*args, **kwargs)
         return data
 
 
@@ -94,8 +97,5 @@ class Renderable(BaseModel):
 
     def model_dump(self, *args, **kwargs):
         data = super().model_dump(*args, **kwargs)
-        data["shape"] = {
-            "type": self.shape.__class__.__name__,
-            **self.shape.model_dump(),
-        }
+        data["shape"] = self.shape.model_dump(*args, **kwargs)
         return data
