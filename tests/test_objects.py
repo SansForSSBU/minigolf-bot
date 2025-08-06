@@ -36,7 +36,7 @@ def test_wall_is_static():
 
     assert isinstance(entity.get(Position), Position)
     assert entity.get(Velocity) is None
-    assert entity.get(PhysicsBody) is None
+    assert entity.get(PhysicsBody).anchored is True
 
 
 def test_hole_is_static_and_separate():
