@@ -72,6 +72,14 @@ class Circle(Shape):
 class Collider(BaseModel):
     shape: Shape
 
+    def model_dump(self, *args, **kwargs):
+        data = super().model_dump(*args, **kwargs)
+        data["shape"] = {
+            "type": self.shape.__class__.__name__,
+            **self.shape.model_dump(),
+        }
+        return data
+
 
 class PhysicsBody(BaseModel):
     mass: float
@@ -86,3 +94,11 @@ class PhysicsBody(BaseModel):
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
     shape: Shape
+
+    def model_dump(self, *args, **kwargs):
+        data = super().model_dump(*args, **kwargs)
+        data["shape"] = {
+            "type": self.shape.__class__.__name__,
+            **self.shape.model_dump(),
+        }
+        return data

@@ -1,0 +1,333 @@
+{
+  "entities": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "components": {
+    "Position": {
+      "0": {
+        "x": 100.0,
+        "y": 900.0
+      },
+      "1": {
+        "x": 900.0,
+        "y": 100.0
+      },
+      "2": {
+        "x": 100.0,
+        "y": 100.0
+      },
+      "3": {
+        "x": 100.0,
+        "y": 100.0
+      },
+      "4": {
+        "x": 100.0,
+        "y": 700.0
+      },
+      "5": {
+        "x": 700.0,
+        "y": 300.0
+      },
+      "6": {
+        "x": 300.0,
+        "y": 300.0
+      },
+      "7": {
+        "x": 300.0,
+        "y": 300.0
+      },
+      "8": {
+        "x": 400.0,
+        "y": 600.0
+      },
+      "9": {
+        "x": 600.0,
+        "y": 400.0
+      },
+      "10": {
+        "x": 400.0,
+        "y": 400.0
+      },
+      "11": {
+        "x": 200.0,
+        "y": 800.0
+      },
+      "12": {
+        "x": 500.0,
+        "y": 500.0
+      }
+    },
+    "Collider": {
+      "0": {
+        "shape": {
+          "type": "Rect",
+          "width": 800.0,
+          "height": 2.0
+        }
+      },
+      "1": {
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 800.0
+        }
+      },
+      "2": {
+        "shape": {
+          "type": "Rect",
+          "width": 800.0,
+          "height": 2.0
+        }
+      },
+      "3": {
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 800.0
+        }
+      },
+      "4": {
+        "shape": {
+          "type": "Rect",
+          "width": 600.0,
+          "height": 2.0
+        }
+      },
+      "5": {
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 400.0
+        }
+      },
+      "6": {
+        "shape": {
+          "type": "Rect",
+          "width": 400.0,
+          "height": 2.0
+        }
+      },
+      "7": {
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 300.0
+        }
+      },
+      "8": {
+        "shape": {
+          "type": "Rect",
+          "width": 200.0,
+          "height": 2.0
+        }
+      },
+      "9": {
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 200.0
+        }
+      },
+      "10": {
+        "shape": {
+          "type": "Rect",
+          "width": 200.0,
+          "height": 2.0
+        }
+      },
+      "11": {
+        "shape": {
+          "type": "Circle",
+          "radius": 5.0
+        }
+      },
+      "12": {
+        "shape": {
+          "type": "Circle",
+          "radius": 10.0
+        }
+      }
+    },
+    "Renderable": {
+      "0": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 800.0,
+          "height": 2.0
+        }
+      },
+      "1": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 800.0
+        }
+      },
+      "2": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 800.0,
+          "height": 2.0
+        }
+      },
+      "3": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 800.0
+        }
+      },
+      "4": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 600.0,
+          "height": 2.0
+        }
+      },
+      "5": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 400.0
+        }
+      },
+      "6": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 400.0,
+          "height": 2.0
+        }
+      },
+      "7": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 300.0
+        }
+      },
+      "8": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 200.0,
+          "height": 2.0
+        }
+      },
+      "9": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 2.0,
+          "height": 200.0
+        }
+      },
+      "10": {
+        "colour": [
+          255,
+          0,
+          0
+        ],
+        "shape": {
+          "type": "Rect",
+          "width": 200.0,
+          "height": 2.0
+        }
+      },
+      "11": {
+        "colour": [
+          255,
+          255,
+          255
+        ],
+        "shape": {
+          "type": "Circle",
+          "radius": 5.0
+        }
+      },
+      "12": {
+        "colour": [
+          91,
+          166,
+          0
+        ],
+        "shape": {
+          "type": "Circle",
+          "radius": 10.0
+        }
+      }
+    },
+    "Velocity": {
+      "11": {
+        "dx": 0.0,
+        "dy": 0.0
+      }
+    },
+    "PhysicsBody": {
+      "11": {
+        "mass": 1.0,
+        "bounciness": 0.4,
+        "friction": 0.5
+      }
+    }
+  }
+}

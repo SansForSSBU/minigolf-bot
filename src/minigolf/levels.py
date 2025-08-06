@@ -38,3 +38,16 @@ def create_level1(world: World) -> None:
 
     # Hole
     add(EntityBuilder().hole(500, 500).build())
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 2:
+        print("Usage: python -m minigolf.levels <output_file.json>")
+        sys.exit(1)
+    output_path = sys.argv[1]
+    world = World()
+    create_level1(world)
+    world.to_json(output_path)
+    print(f"Level 1 exported to {output_path}")
