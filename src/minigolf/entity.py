@@ -18,15 +18,16 @@ class PhysicsObject:
 
     @classmethod
     def from_entity(cls, entity: "Entity") -> "PhysicsObject | None":
-        assert (pos := entity.get(Position)) is not None
-        assert (col := entity.get(Collider)) is not None
+        pos = entity.get(Position)
+        col = entity.get(Collider)
+        if pos is None or col is None:
+            return None
         vel = entity.get(Velocity)
         bodydef = entity.get(PhysicsBody)
         is_dynamic = isinstance(vel, Velocity) and bodydef is not None
         body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
         body = pymunk.Body(body_type=body_type)
-        if bodydef is not None:
-            assert vel is not None
+        if bodydef is not None and vel is not None:
             body.mass = bodydef.mass
             body.moment = BALL_MOMENT
             body.velocity = vel.dx, vel.dy
@@ -82,9 +83,10 @@ class Entity:
             del self.components[component_type]
 
     def sync_with_pymunk_body(self, pymunk_body) -> None:
-        assert (pos := self.get(Position)) is not None
-        assert (col := self.get(Collider)) is not None
-        pos.x, pos.y = from_pymunk_position(col.shape, pymunk_body.position)
+        if (pos := self.get(Position)) is not None and (
+            col := self.get(Collider)
+        ) is not None:
+            pos.x, pos.y = from_pymunk_position(col.shape, pymunk_body.position)
 
     def to_pygame(self):
         raise NotImplementedError

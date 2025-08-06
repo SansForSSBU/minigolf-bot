@@ -16,7 +16,8 @@ STOPPING_VELOCITY = 10.0
 
 def control_system(world, physics_system):
     balls = world.get_balls()
-    assert len(balls) == 1
+    if len(balls) != 1:
+        raise ValueError("Level has too many balls")
     ball = balls[0]
     pymunk_ball = physics_system.eid_to_body[ball.id]
     if pymunk_ball.body.velocity.length < STOPPING_VELOCITY:
