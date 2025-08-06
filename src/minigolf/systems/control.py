@@ -19,15 +19,15 @@ def control_system(world, physics_system):
     assert len(balls) == 1
     ball = balls[0]
     pymunk_ball = physics_system.eid_to_body[ball.id]
-    if pymunk_ball.velocity.length < STOPPING_VELOCITY:
+    if pymunk_ball.body.velocity.length < STOPPING_VELOCITY:
         stop_ball(pymunk_ball)
         try:
             next_move = moves.pop()
-            pymunk_ball.velocity = next_move[0]
-            pymunk_ball.angular_velocity = next_move[1]
+            pymunk_ball.body.velocity = next_move[0]
+            pymunk_ball.body.angular_velocity = next_move[1]
         except IndexError:
             print("No moves left")
 
 
 def stop_ball(pymunk_ball):
-    pymunk_ball.velocity = Vec2d(0.0, 0.0)
+    pymunk_ball.body.velocity = Vec2d(0.0, 0.0)
