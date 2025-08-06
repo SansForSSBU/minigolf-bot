@@ -5,7 +5,7 @@ import click
 import pygame
 from loguru import logger
 
-from minigolf.levels import create_level1
+from minigolf.game.levels import create_level1
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.rendering import render_system
 from minigolf.world import World

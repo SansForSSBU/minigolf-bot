@@ -20,7 +20,7 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [project.scripts]
-minigolf = "minigolf.game:cli"
+minigolf = "minigolf.game.main:cli"
 minigolf-editor = "minigolf.editor.main:cli"
 
 [tool.uv]
