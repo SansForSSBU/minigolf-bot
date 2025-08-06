@@ -83,6 +83,14 @@ class World:
             if isinstance(obj, type) and issubclass(obj, BaseModel)
         }
 
+        # Map shape type names to concrete classes
+        from minigolf.components import Rect, Circle  # Add more shapes as needed
+
+        SHAPE_CLASSES = {
+            "Rect": Rect,
+            "Circle": Circle,
+        }
+
         for eid_str in data["entities"]:
             eid = int(eid_str)
             entity = Entity()
@@ -95,6 +103,18 @@ class World:
                 raise ValueError(f"Unknown component type: {comp_name}")
             for eid_str, comp_data in eid_map.items():
                 eid = int(eid_str)
+                # Special handling for components with a 'shape' field
+                if (
+                    "shape" in comp_data
+                    and isinstance(comp_data["shape"], dict)
+                    and "type" in comp_data["shape"]
+                ):
+                    shape_info = comp_data["shape"].copy()
+                    shape_type = shape_info.pop("type")
+                    shape_cls = SHAPE_CLASSES.get(shape_type)
+                    if not shape_cls:
+                        raise ValueError(f"Unknown shape type: {shape_type}")
+                    comp_data["shape"] = shape_cls(**shape_info)
                 component = comp_cls(**comp_data)
                 world.entities[eid].add(component)
 
