@@ -29,7 +29,10 @@ class EntityBuilder:
             Position(x=x, y=y),
             Velocity(dx=0, dy=0),
             PhysicsBody(
-                mass=1.0, bounciness=DEFAULT_ELASTICITY, friction=DEFAULT_WALL_FRICTION
+                mass=1.0,
+                bounciness=DEFAULT_ELASTICITY,
+                friction=DEFAULT_WALL_FRICTION,
+                anchored=False,
             ),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),

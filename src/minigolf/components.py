@@ -85,10 +85,7 @@ class PhysicsBody(BaseModel):
     mass: float
     bounciness: float  # restitution
     friction: float
-    # TODO: Should anchored be an attribute of this?
-    # Currently we infer that if something has a PhysicsBody then it's not anchored.
-    # However, PhysicsBodies have bounciness and friction values.
-    # Anchored entities also have these values but pull from a global default for these values.
+    anchored: bool
 
 
 class Renderable(BaseModel):

@@ -5,7 +5,7 @@ from typing import Any, TypeVar
 from pydantic import BaseModel
 
 from minigolf import components
-from minigolf.entity import Entity
+from minigolf.entity import Entity, PhysicsBody
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -34,9 +34,10 @@ class World:
 
     def get_balls(self):
         # TODO: The ball entity should have some unique tag associated with it but this will work for now
-        dynamic_bodies = self.all_with(components.PhysicsBody)
-        return dynamic_bodies
-        pass
+        physics_bodies = self.all_with(components.PhysicsBody)
+        return [
+            entity for entity in physics_bodies if not entity.get(PhysicsBody).anchored
+        ]
 
     def get_entity(self, eid: int) -> Entity:
         return self.entities[eid]

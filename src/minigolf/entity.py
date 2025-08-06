@@ -24,7 +24,9 @@ class PhysicsObject:
             return None
         vel = entity.get(Velocity)
         bodydef = entity.get(PhysicsBody)
-        is_dynamic = isinstance(vel, Velocity) and bodydef is not None
+        is_dynamic = (
+            bodydef is not None and not bodydef.anchored
+        )  # isinstance(vel, Velocity) and bodydef is not None
         body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
         body = pymunk.Body(body_type=body_type)
         if bodydef is not None and vel is not None:
