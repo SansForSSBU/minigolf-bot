@@ -38,6 +38,26 @@ class Shape(BaseModel, ABC):
         data["type"] = self.__class__.__name__
         return data
 
+    @classmethod
+    def model_construct_from_dict(cls, data: dict) -> "Shape":
+        shape_type = data.get("type")
+        if not shape_type:
+            raise ValueError("Missing 'type' in shape data")
+        # Import here to avoid circular imports
+        from minigolf.components import Rect, Circle
+
+        SHAPE_CLASSES = {
+            "Rect": Rect,
+            "Circle": Circle,
+        }
+        shape_cls = SHAPE_CLASSES.get(shape_type)
+        if not shape_cls:
+            raise ValueError(f"Unknown shape type: {shape_type}")
+        # Remove 'type' before passing to constructor
+        data = dict(data)
+        data.pop("type", None)
+        return shape_cls(**data)
+
 
 class Rect(Shape):
     width: float
