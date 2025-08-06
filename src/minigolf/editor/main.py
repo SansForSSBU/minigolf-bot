@@ -4,7 +4,7 @@ import pygame
 from pygame import Surface
 from loguru import logger
 
-from minigolf.editor.state import State, init_state
+from minigolf.editor.state import State
 from minigolf.editor.ui import setup_ui
 from minigolf.editor.actions import handle_event, handle_drag
 from minigolf.editor.draw import draw_everything
@@ -18,7 +18,7 @@ def main_loop() -> None:
     pygame.display.set_caption("Minigolf Level Editor")
     clock = pygame.time.Clock()
 
-    state = init_state(screen)
+    state = State(screen)
     setup_ui(state)
     logger.info("Editor initialised.")
 

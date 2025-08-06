@@ -10,7 +10,7 @@ from loguru import logger
 from minigolf.editor.consts import TOOL_KEYS, Tool
 from minigolf.editor.files import get_filename
 from minigolf.editor.grid import build_entity, get_entity_at, snap_to_grid
-from minigolf.editor.state import State, clear_world, save_world
+from minigolf.editor.state import State
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.world import World
 
@@ -116,7 +116,7 @@ def _button_save(state: State) -> None:
     if filename.exists():
         _show_save_confirmation_dialog(state, filename)
     else:
-        save_world(state, filename)
+        state.save_world(filename)
 
 
 def _button_load(state: State) -> None:
@@ -124,7 +124,7 @@ def _button_load(state: State) -> None:
 
 
 def _button_clear(state: State) -> None:
-    clear_world(state)
+    state.clear_world()
 
 
 def _handle_file_dialog(event: pygame.event.Event, state: State) -> None:

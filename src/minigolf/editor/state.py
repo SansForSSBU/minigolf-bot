@@ -40,43 +40,59 @@ class State:
     confirm_dialog: pygame_gui.windows.UIConfirmationDialog | None = None
     filename_entry: pygame_gui.elements.UITextEntryLine | None = None
 
+    def __init__(self, screen: pygame.Surface = None):
+        self.TILE_SIZE = 50
+        self.GRID_WIDTH = 16
+        self.GRID_HEIGHT = 16
+        self.CANVAS_WIDTH = self.GRID_WIDTH * self.TILE_SIZE
+        self.UI_WIDTH = 250
+        self.SCREEN_WIDTH = self.CANVAS_WIDTH + self.UI_WIDTH
+        self.SCREEN_HEIGHT = self.GRID_HEIGHT * self.TILE_SIZE
+
+        self.world = World()
+        self.physics = PhysicsSpace(self.world)
+        self.manager = None
+        self.screen = None
+        if screen is not None:
+            self.screen = screen
+            self.manager = pygame_gui.UIManager((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            self.manager.set_window_resolution((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            self.physics.populate()
+
+        self.current_tool = Tool.WALL
+        self.undo_stack = []
+        self.redo_stack = []
+        self.drag_painting = False
+        self.mouse_over_ui = False
+        self.file_dialog = None
+        self.confirm_dialog = None
+        self.filename_entry = None
+
     def update_mouse(self) -> None:
         self.mouse_over_ui = self.manager.get_hovering_any_element()
 
+    def save_world(state: State, filename: Path) -> None:
+        state.world.to_json(filename)
+        logger.info(f"Saved level to {filename}")
 
-def init_state(screen: pygame.Surface) -> State:
-    state = State()
-    state.screen = screen
-    state.manager = pygame_gui.UIManager((state.SCREEN_WIDTH, state.SCREEN_HEIGHT))
-    state.manager.set_window_resolution((state.SCREEN_WIDTH, state.SCREEN_HEIGHT))
-    state.physics = PhysicsSpace(state.world)
-    state.physics.populate()
-    return state
+    def load_world(state: State, filename: Path) -> None:
+        # TODO: This method is unused.
+        state.world = World.from_json(filename)
+        state.physics = PhysicsSpace(state.world)
+        state.physics.populate()
+        state.undo_stack.clear()
+        logger.info(f"Loaded level from {filename}")
+        if state.filename_entry:
+            state.filename_entry.set_text(filename.name)
 
-
-def save_world(state: State, filename: Path) -> None:
-    state.world.to_json(filename)
-    logger.info(f"Saved level to {filename}")
-
-
-def load_world(state: State, filename: Path) -> None:
-    state.world = World.from_json(filename)
-    state.physics = PhysicsSpace(state.world)
-    state.physics.populate()
-    state.undo_stack.clear()
-    logger.info(f"Loaded level from {filename}")
-    if state.filename_entry:
-        state.filename_entry.set_text(filename.name)
-
-
-def clear_world(state: State) -> None:
-    if state.world.entities:
-        logger.info("Clearing all entities in the world")
-        state.undo_stack.append(copy.deepcopy(state.world.entities))
-        state.redo_stack.clear()
-        state.world.entities.clear()
-        state.physics.eid_to_body.clear()
-        state.physics.space.remove(
-            *state.physics.space.bodies, *state.physics.space.shapes
-        )
-        logger.info("World cleared and physics reset")
+    def clear_world(state: State) -> None:
+        if state.world.entities:
+            logger.info("Clearing all entities in the world")
+            state.undo_stack.append(copy.deepcopy(state.world.entities))
+            state.redo_stack.clear()
+            state.world.entities.clear()
+            state.physics.eid_to_body.clear()
+            state.physics.space.remove(
+                *state.physics.space.bodies, *state.physics.space.shapes
+            )
+            logger.info("World cleared and physics reset")
