@@ -61,6 +61,23 @@ class Entity:
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components
 
+    def to_pymunk_position(self):
+        pos = self.get(Position)
+        col = self.get(Collider)
+        if not (pos and col):
+            return None
+        return (pos.x + col.shape.width / 2, pos.y + col.shape.height / 2)
+
+    def from_pymunk_position(self, pos):
+        col = self.get(Collider)
+        if not col or col.shape.type != "rect":
+            raise NotImplementedError
+        bx, by = pos
+        return Position(
+            x=bx - (col.shape.width / 2),
+            y=by - (col.shape.height / 2),
+        )
+
     def remove(self, component_type: type[BaseModel]) -> None:
         if component_type in self.components:
             del self.components[component_type]

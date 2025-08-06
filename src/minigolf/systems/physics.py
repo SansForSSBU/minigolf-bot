@@ -23,13 +23,13 @@ class PhysicsSpace:
 
         for eid, phys_obj in self.eid_to_body.items():
             entity = self.world.get_entity(eid)
-            entity.sync_with_pymunk_body(phys_obj)  # access inner pymunk.Body here
+            entity.sync_with_pymunk_body(phys_obj.body)  # access inner pymunk.Body here
 
     def add_entity(self, entity: Entity) -> None:
         phys_obj = PhysicsObject.from_entity(entity)
         if phys_obj:
             phys_obj.add_to_space(self.space)
-            self.eid_to_body[entity.id] = phys_obj.body
+            self.eid_to_body[entity.id] = phys_obj
 
     def remove_entity(self, entity: Entity) -> None:
         phys_obj = self.eid_to_body.pop(entity.id, None)
