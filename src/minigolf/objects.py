@@ -54,6 +54,12 @@ class EntityBuilder:
             Position(x=x, y=y),
             Collider(shape=shape),
             Renderable(colour=(255, 0, 0), shape=shape),
+            PhysicsBody(
+                mass=float("inf"),
+                bounciness=DEFAULT_ELASTICITY,
+                friction=DEFAULT_WALL_FRICTION,
+                anchored=True,
+            ),
         ]
         return self
 

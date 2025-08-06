@@ -20,19 +20,17 @@ class PhysicsObject:
     def from_entity(cls, entity: "Entity") -> "PhysicsObject | None":
         pos = entity.get(Position)
         col = entity.get(Collider)
-        if pos is None or col is None:
-            return None
-        vel = entity.get(Velocity)
         bodydef = entity.get(PhysicsBody)
-        is_dynamic = (
-            bodydef is not None and not bodydef.anchored
-        )  # isinstance(vel, Velocity) and bodydef is not None
-        body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
-        body = pymunk.Body(body_type=body_type)
-        if bodydef is not None and vel is not None:
+        if pos is None or col is None or bodydef is None:
+            return None
+        if not bodydef.anchored:
+            vel = entity.get(Velocity)
+            body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
             body.mass = bodydef.mass
             body.moment = BALL_MOMENT
             body.velocity = vel.dx, vel.dy
+        else:
+            body = pymunk.Body(body_type=pymunk.Body.STATIC)
 
         body.position = to_pymunk_position(col.shape, pos)
         shape = col.shape.to_pymunk(body)
