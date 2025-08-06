@@ -61,6 +61,10 @@ class Entity:
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components
 
+    def remove(self, component_type: type[BaseModel]) -> None:
+        if component_type in self.components:
+            del self.components[component_type]
+
     def sync_with_pymunk_body(self, pymunk_body) -> None:
         assert (pos := self.get(Position)) is not None
         assert (col := self.get(Collider)) is not None

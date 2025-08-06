@@ -5,7 +5,7 @@ import click
 import pygame
 from loguru import logger
 
-from minigolf.levels import create_level1
+from minigolf.game.levels import create_level1
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.rendering import render_system
 from minigolf.systems.control import control_system
@@ -49,7 +49,7 @@ def cli(path: Path | None) -> None:
             logger.error(f"File not found: {path}")
             sys.exit(1)
         logger.info(f"📂 Loading world from {path}")
-        world = World.from_json(str(path))
+        world = World.from_json(path)
     else:
         logger.info("🧱 Creating default level1 from code")
         world = World()

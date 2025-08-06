@@ -1,5 +1,6 @@
 import pymunk
 
+from minigolf.components import Collider
 from minigolf.entity import Entity, PhysicsObject
 from minigolf.world import World
 from minigolf.constants import DEFAULT_FLOOR_FRICTION
@@ -14,21 +15,24 @@ class PhysicsSpace:
 
     def populate(self):
         for entity in self.world.entities.values():
-            body: PhysicsObject | None = PhysicsObject.from_entity(entity)
-            if body:
-                body.add_to_space(self.space)
-                self.eid_to_body[entity.id] = body.body
+            self.add_entity(entity)
 
     def step(self, timestep=1 / 60, substeps=50):
         for _ in range(substeps):
             self.space.step(timestep / substeps)
 
-        for eid, body in self.eid_to_body.items():
+        for eid, phys_obj in self.eid_to_body.items():
             entity = self.world.get_entity(eid)
-            entity.sync_with_pymunk_body(body)
+            entity.sync_with_pymunk_body(phys_obj)  # access inner pymunk.Body here
 
     def add_entity(self, entity: Entity) -> None:
-        raise NotImplementedError
+        phys_obj = PhysicsObject.from_entity(entity)
+        if phys_obj:
+            phys_obj.add_to_space(self.space)
+            self.eid_to_body[entity.id] = phys_obj.body
 
-    def rm_entity(self, entity: Entity) -> None:
-        raise NotImplementedError
+    def remove_entity(self, entity: Entity) -> None:
+        phys_obj = self.eid_to_body.pop(entity.id, None)
+        if phys_obj:
+            self.space.remove(phys_obj.body, phys_obj.shape)
+            entity.remove(Collider)

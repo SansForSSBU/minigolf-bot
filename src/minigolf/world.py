@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import Any, TypeVar
 
 from pydantic import BaseModel
@@ -60,14 +61,16 @@ class World:
             "components": out,
         }
 
-    def to_json(self, path: str) -> None:
-        with open(path, "w") as f:
-            json.dump(self.to_json_dict(), f, indent=2)
+    def to_json(self, path: Path) -> None:
+        """
+        Save the world to a JSON file.
+        """
+        data = self.to_json_dict()
+        path.write_text(json.dumps(data, indent=4))
 
     @classmethod
-    def from_json(cls, path: str) -> "World":
-        with open(path) as f:
-            data = json.load(f)
+    def from_json(cls, path: Path) -> "World":
+        data = json.loads(path.read_text())
         return cls.from_json_dict(data)
 
     @classmethod
@@ -94,5 +97,7 @@ class World:
                 eid = int(eid_str)
                 component = comp_cls(**comp_data)
                 world.entities[eid].add(component)
+
+        world._next_id = max(world.entities.keys(), default=-1) + 1
 
         return world
