@@ -1,34 +1,23 @@
 from pymunk import Vec2d
-
-moves = list(
-    reversed(
-        [
-            [Vec2d(300.0, 0.0), 10000.0],
-            [Vec2d(0.0, -300.0), 10000.0],
-            [Vec2d(-300.0, 0.0), 10000.0],
-            [Vec2d(-15.0, 500.0), 10000.0],
-        ]
-    )
-)
+from minigolf.constants import DEFAULT_MOVES
 
 STOPPING_VELOCITY = 10.0
 
 
-def control_system(world, physics_system):
-    balls = world.get_balls()
-    if len(balls) != 1:
-        raise ValueError("Level has too many balls")
-    ball = balls[0]
-    pymunk_ball = physics_system.eid_to_body[ball.id]
-    if pymunk_ball.body.velocity.length < STOPPING_VELOCITY:
-        stop_ball(pymunk_ball)
-        try:
-            next_move = moves.pop()
-            pymunk_ball.body.velocity = next_move[0]
-            pymunk_ball.body.angular_velocity = next_move[1]
-        except IndexError:
-            print("No moves left")
+class ControlSystem:
+    def __init__(self, ball, moves=None):
+        self.moves = moves if moves is not None else DEFAULT_MOVES
+        self.ball = ball
 
+    def step(self):
+        if self.ball.body.velocity.length < STOPPING_VELOCITY:
+            self.stop_ball()
+            try:
+                next_move = self.moves.pop()
+                self.ball.body.velocity = next_move[0]
+                self.ball.body.angular_velocity = next_move[1]
+            except IndexError:
+                return
 
-def stop_ball(pymunk_ball):
-    pymunk_ball.body.velocity = Vec2d(0.0, 0.0)
+    def stop_ball(self):
+        self.ball.body.velocity = Vec2d(0.0, 0.0)
