@@ -1,3 +1,4 @@
+import pytest
 import pygame
 from unittest.mock import patch, MagicMock
 from minigolf.systems.rendering import render_system
@@ -22,10 +23,16 @@ class DummyWorld(World):
         return [entity_rect, entity_circle]
 
 
-def test_render_system_mocks_draw_at():
+@pytest.fixture
+def screen():
     pygame.init()
-    pygame.display.set_mode((100, 100))  # Dummy display for Pygame, now 100x100
+    pygame.display.set_mode((100, 100))
     screen = MagicMock(spec=pygame.Surface)
+    yield screen
+    pygame.quit()
+
+
+def test_render_system_mocks_draw_at(screen):
     world = DummyWorld()
     with (
         patch.object(Rect, "draw_at", autospec=True) as mock_rect_draw_at,
@@ -45,14 +52,9 @@ def test_render_system_mocks_draw_at():
         assert circ_args[1] is screen
         assert isinstance(circ_args[2], Position)
         assert circ_args[3] == (0, 255, 0)
-    pygame.quit()
 
 
-def test_render_system_no_renderable_entities():
-    pygame.init()
-    pygame.display.set_mode((100, 100))
-    screen = MagicMock(spec=pygame.Surface)
-
+def test_render_system_no_renderable_entities(screen):
     class EmptyWorld(World):
         def all_with(self, *types):
             return []
@@ -66,14 +68,9 @@ def test_render_system_no_renderable_entities():
         # Assert draw_at was not called for either shape
         assert not mock_rect_draw_at.called
         assert not mock_circle_draw_at.called
-    pygame.quit()
 
 
-def test_render_system_multiple_entities_each_shape():
-    pygame.init()
-    pygame.display.set_mode((100, 100))
-    screen = MagicMock(spec=pygame.Surface)
-
+def test_render_system_multiple_entities_each_shape(screen):
     class MultiWorld(World):
         def all_with(self, *types):
             entities = []
@@ -111,4 +108,3 @@ def test_render_system_multiple_entities_each_shape():
             assert args[1] is screen
             assert isinstance(args[2], Position)
             assert args[3] == (0, 255, 0)
-    pygame.quit()
