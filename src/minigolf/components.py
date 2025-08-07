@@ -1,7 +1,8 @@
-from typing import Literal
-
+from abc import ABC, abstractmethod
 import pygame
+import pymunk
 from pydantic import BaseModel
+from minigolf.utils import add_tuples
 
 
 class Position(BaseModel):
@@ -14,29 +15,107 @@ class Velocity(BaseModel):
     dy: float
 
 
-class Shape(BaseModel):
-    type: Literal["rect", "circle"]
-    width: int | None = None
-    height: int | None = None
-    radius: int | None = None
+class Shape(BaseModel, ABC):
+    @abstractmethod
+    def pymunk_offset(self) -> tuple[float, float]:
+        pass
 
-    def to_pygame_shape(self, pos: Position):
-        if self.type == "rect":
-            return pygame.Rect(pos.x, pos.y, self.width, self.height)
-        elif self.type == "circle":
-            raise NotImplementedError
+    @abstractmethod
+    def pygame_offset(self) -> tuple[float, float]:
+        pass
+
+    @abstractmethod
+    def draw_at(self, screen, pos, colour) -> None:
+        pass
+
+    @abstractmethod
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly | pymunk.Circle:
+        pass
+
+    def model_dump(self, *args, **kwargs):
+        # Default: include type info for all shapes
+        data = super().model_dump(*args, **kwargs)
+        data["type"] = self.__class__.__name__
+        return data
+
+    @classmethod
+    def model_construct_from_dict(cls, data: dict) -> "Shape":
+        shape_type = data.get("type")
+        if not shape_type:
+            raise ValueError("Missing 'type' in shape data")
+        # Import here to avoid circular imports
+        from minigolf.components import Rect, Circle
+
+        SHAPE_CLASSES = {
+            "Rect": Rect,
+            "Circle": Circle,
+        }
+        shape_cls = SHAPE_CLASSES.get(shape_type)
+        if not shape_cls:
+            raise ValueError(f"Unknown shape type: {shape_type}")
+        # Remove 'type' before passing to constructor
+        data = dict(data)
+        data.pop("type", None)
+        return shape_cls(**data)
+
+
+class Rect(Shape):
+    width: float
+    height: float
+
+    def pymunk_offset(self) -> tuple[float, float]:
+        return (self.width / 2, self.height / 2)
+
+    def pygame_offset(self) -> tuple[float, float]:
+        return (0, 0)
+
+    def draw_at(self, screen, pos, colour) -> None:
+        draw_pos = add_tuples((pos.x, pos.y), self.pygame_offset())
+        rect = pygame.Rect(draw_pos[0], draw_pos[1], self.width, self.height)
+        pygame.draw.rect(surface=screen, color=colour, rect=rect)
+
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly:
+        return pymunk.Poly.create_box(body, (self.width, self.height))
+
+
+class Circle(Shape):
+    radius: float
+
+    def pymunk_offset(self) -> tuple[float, float]:
+        return (0, 0)
+
+    def pygame_offset(self) -> tuple[float, float]:
+        return (0, 0)
+
+    def draw_at(self, screen, pos, colour) -> None:
+        draw_pos = add_tuples((pos.x, pos.y), self.pygame_offset())
+        pygame.draw.circle(screen, colour, draw_pos, self.radius)
+
+    def to_pymunk(self, body: pymunk.Body) -> pymunk.Circle:
+        return pymunk.Circle(body, self.radius)
 
 
 class Collider(BaseModel):
     shape: Shape
+
+    def model_dump(self, *args, **kwargs):
+        data = super().model_dump(*args, **kwargs)
+        data["shape"] = self.shape.model_dump(*args, **kwargs)
+        return data
 
 
 class PhysicsBody(BaseModel):
     mass: float
     bounciness: float  # restitution
     friction: float
+    anchored: bool
 
 
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
     shape: Shape
+
+    def model_dump(self, *args, **kwargs):
+        data = super().model_dump(*args, **kwargs)
+        data["shape"] = self.shape.model_dump(*args, **kwargs)
+        return data

@@ -5,7 +5,7 @@ from typing import Any, TypeVar
 from pydantic import BaseModel
 
 from minigolf import components
-from minigolf.entity import Entity
+from minigolf.entity import Entity, PhysicsBody
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -31,6 +31,13 @@ class World:
         entity = Entity()
         self.entities[eid] = entity
         return entity
+
+    def get_balls(self):
+        # TODO: The ball entity should have some unique tag associated with it but this will work for now
+        physics_bodies = self.all_with(components.PhysicsBody)
+        return [
+            entity for entity in physics_bodies if not entity.get(PhysicsBody).anchored
+        ]
 
     def get_entity(self, eid: int) -> Entity:
         return self.entities[eid]
@@ -89,6 +96,13 @@ class World:
                 raise ValueError(f"Unknown component type: {comp_name}")
             for eid_str, comp_data in eid_map.items():
                 eid = int(eid_str)
+                # Let Shape handle its own deserialization
+                if "shape" in comp_data and isinstance(comp_data["shape"], dict):
+                    from minigolf.components import Shape
+
+                    comp_data["shape"] = Shape.model_construct_from_dict(
+                        comp_data["shape"]
+                    )
                 component = comp_cls(**comp_data)
                 world.entities[eid].add(component)
 

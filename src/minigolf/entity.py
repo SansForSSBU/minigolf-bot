@@ -4,7 +4,8 @@ import pymunk
 from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
-
+from minigolf.utils import from_pymunk_position, to_pymunk_position
+from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION, BALL_MOMENT
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -19,35 +20,23 @@ class PhysicsObject:
     def from_entity(cls, entity: "Entity") -> "PhysicsObject | None":
         pos = entity.get(Position)
         col = entity.get(Collider)
-        vel = entity.get(Velocity)
         bodydef = entity.get(PhysicsBody)
-
-        if not (pos and col):
+        if pos is None or col is None or bodydef is None:
             return None
-
-        if col.shape.type != "rect":
-            raise NotImplementedError("Only rect colliders are supported for now.")
-
-        is_dynamic = vel is not None and bodydef is not None
-
-        body_type = pymunk.Body.DYNAMIC if is_dynamic else pymunk.Body.STATIC
-        body = pymunk.Body(body_type=body_type)
-
-        if is_dynamic:
+        if not bodydef.anchored:
+            vel = entity.get(Velocity)
+            body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
             body.mass = bodydef.mass
-            body.moment = float("inf")
-            body.velocity = (vel.dx, vel.dy)
+            body.moment = BALL_MOMENT
+            body.velocity = vel.dx, vel.dy
+        else:
+            body = pymunk.Body(body_type=pymunk.Body.STATIC)
 
-        width, height = col.shape.width, col.shape.height
-        if width is None or height is None:
-            raise ValueError("Collider shape missing width/height")
+        body.position = to_pymunk_position(col.shape, pos)
+        shape = col.shape.to_pymunk(body)
 
-        # Centre body using shape
-        body.position = entity.to_pymunk_position()
-
-        shape = pymunk.Poly.create_box(body, (width, height))
-        shape.elasticity = 1
-        shape.friction = 0
+        shape.elasticity = DEFAULT_ELASTICITY
+        shape.friction = DEFAULT_WALL_FRICTION
 
         return cls(entity, body, shape)
 
@@ -72,10 +61,6 @@ class Entity:
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components
 
-    def remove(self, component_type: type[BaseModel]) -> None:
-        if component_type in self.components:
-            del self.components[component_type]
-
     def to_pymunk_position(self):
         pos = self.get(Position)
         col = self.get(Collider)
@@ -93,13 +78,15 @@ class Entity:
             y=by - (col.shape.height / 2),
         )
 
-    def sync_with_pymunk_body(self, body) -> None:
-        pos = self.get(Position)
-        if not pos:
-            return
-        new_pos = self.from_pymunk_position(body.position)
-        pos.x = new_pos.x
-        pos.y = new_pos.y
+    def remove(self, component_type: type[BaseModel]) -> None:
+        if component_type in self.components:
+            del self.components[component_type]
+
+    def sync_with_pymunk_body(self, pymunk_body) -> None:
+        if (pos := self.get(Position)) is not None and (
+            col := self.get(Collider)
+        ) is not None:
+            pos.x, pos.y = from_pymunk_position(col.shape, pymunk_body.position)
 
     def to_pygame(self):
         raise NotImplementedError

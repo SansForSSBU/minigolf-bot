@@ -8,7 +8,9 @@ from loguru import logger
 from minigolf.game.levels import create_level1
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.rendering import render_system
+from minigolf.systems.control import ControlSystem
 from minigolf.world import World
+from minigolf.constants import SIMULATION_SPEED
 
 
 # Game loop runner
@@ -17,6 +19,11 @@ def main_loop(world: World) -> None:
     screen = pygame.display.set_mode((1000, 1000))
     physics_system = PhysicsSpace(world)
     physics_system.populate()
+    balls = world.get_balls()
+    if len(balls) != 1:
+        raise ValueError("World should only have 1 ball")
+    ball = physics_system.eid_to_body[balls[0].id]
+    control_system = ControlSystem(ball)
     clock = pygame.time.Clock()
 
     while True:
@@ -26,9 +33,10 @@ def main_loop(world: World) -> None:
                 sys.exit()
 
         physics_system.step()
+        control_system.step()
         render_system(world, screen)
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(60 * SIMULATION_SPEED)
 
 
 @click.command()

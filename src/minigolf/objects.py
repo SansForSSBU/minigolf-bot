@@ -3,15 +3,18 @@ from minigolf.components import (
     PhysicsBody,
     Position,
     Renderable,
-    Shape,
+    Rect,
+    Circle,
     Velocity,
 )
 from minigolf.entity import Entity
+from pydantic import BaseModel
+from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 
 
 class EntityBuilder:
     def __init__(self):
-        self.components: list[object] = []
+        self.components: list[BaseModel] = []
 
     def ball(self, x: float, y: float) -> "EntityBuilder":
         """
@@ -21,11 +24,16 @@ class EntityBuilder:
             x (float): The x-coordinate of the ball's position.
             y (float): The y-coordinate of the ball's position.
         """
-        shape = Shape(type="rect", width=10, height=10)
+        shape = Circle(radius=5)
         self.components += [
             Position(x=x, y=y),
             Velocity(dx=0, dy=0),
-            PhysicsBody(mass=1.0, bounciness=0.9, friction=0.01),
+            PhysicsBody(
+                mass=1.0,
+                bounciness=DEFAULT_ELASTICITY,
+                friction=DEFAULT_WALL_FRICTION,
+                anchored=False,
+            ),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),
         ]
@@ -41,11 +49,17 @@ class EntityBuilder:
             width (int): The width of the wall.
             height (int): The height of the wall.
         """
-        shape = Shape(type="rect", width=width, height=height)
+        shape = Rect(width=width, height=height)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
             Renderable(colour=(255, 0, 0), shape=shape),
+            PhysicsBody(
+                mass=float("inf"),
+                bounciness=DEFAULT_ELASTICITY,
+                friction=DEFAULT_WALL_FRICTION,
+                anchored=True,
+            ),
         ]
         return self
 
@@ -59,7 +73,7 @@ class EntityBuilder:
         Returns:
             int: The entity ID of the created hole.
         """
-        shape = Shape(type="rect", width=20, height=20)
+        shape = Circle(radius=10)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
