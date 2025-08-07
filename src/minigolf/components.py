@@ -1,7 +1,9 @@
-from abc import ABC, abstractmethod
+from typing import Annotated, Literal
+
 import pygame
 import pymunk
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 from minigolf.utils import add_tuples
 
 
@@ -15,51 +17,8 @@ class Velocity(BaseModel):
     dy: float
 
 
-class Shape(BaseModel, ABC):
-    @abstractmethod
-    def pymunk_offset(self) -> tuple[float, float]:
-        pass
-
-    @abstractmethod
-    def pygame_offset(self) -> tuple[float, float]:
-        pass
-
-    @abstractmethod
-    def draw_at(self, screen, pos, colour) -> None:
-        pass
-
-    @abstractmethod
-    def to_pymunk(self, body: pymunk.Body) -> pymunk.Poly | pymunk.Circle:
-        pass
-
-    def model_dump(self, *args, **kwargs):
-        # Default: include type info for all shapes
-        data = super().model_dump(*args, **kwargs)
-        data["type"] = self.__class__.__name__
-        return data
-
-    @classmethod
-    def model_construct_from_dict(cls, data: dict) -> "Shape":
-        shape_type = data.get("type")
-        if not shape_type:
-            raise ValueError("Missing 'type' in shape data")
-        # Import here to avoid circular imports
-        from minigolf.components import Rect, Circle
-
-        SHAPE_CLASSES = {
-            "Rect": Rect,
-            "Circle": Circle,
-        }
-        shape_cls = SHAPE_CLASSES.get(shape_type)
-        if not shape_cls:
-            raise ValueError(f"Unknown shape type: {shape_type}")
-        # Remove 'type' before passing to constructor
-        data = dict(data)
-        data.pop("type", None)
-        return shape_cls(**data)
-
-
-class Rect(Shape):
+class Rect(BaseModel):
+    type: Literal["Rect", "rect"] = "rect"
     width: float
     height: float
 
@@ -78,7 +37,8 @@ class Rect(Shape):
         return pymunk.Poly.create_box(body, (self.width, self.height))
 
 
-class Circle(Shape):
+class Circle(BaseModel):
+    type: Literal["Circle", "circle"] = "circle"
     radius: float
 
     def pymunk_offset(self) -> tuple[float, float]:
@@ -95,13 +55,11 @@ class Circle(Shape):
         return pymunk.Circle(body, self.radius)
 
 
+Shape = Annotated[Rect | Circle, Field(discriminator="type")]
+
+
 class Collider(BaseModel):
     shape: Shape
-
-    def model_dump(self, *args, **kwargs):
-        data = super().model_dump(*args, **kwargs)
-        data["shape"] = self.shape.model_dump(*args, **kwargs)
-        return data
 
 
 class PhysicsBody(BaseModel):
@@ -114,8 +72,3 @@ class PhysicsBody(BaseModel):
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
     shape: Shape
-
-    def model_dump(self, *args, **kwargs):
-        data = super().model_dump(*args, **kwargs)
-        data["shape"] = self.shape.model_dump(*args, **kwargs)
-        return data
