@@ -1,3 +1,4 @@
+from enum import Enum
 from minigolf.components import (
     Collider,
     Hole,
@@ -13,9 +14,30 @@ from pydantic import BaseModel
 from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 
 
+class EntityRole(str, Enum):
+    BALL = "ball"
+    WALL = "wall"
+    HOLE = "hole"
+
+
 class EntityBuilder:
     def __init__(self):
         self.components: list[BaseModel] = []
+        self._role: EntityRole | None = None
+
+    def _set_role(self, role: EntityRole) -> None:
+        """
+        Role: a type of entity being built (e.g. "ball", "wall", "hole").
+        A builder can only be used for one role at a time.
+        This method ensures the builder is locked to a specific role.
+        This prevents accidental mixing of components across different entity types.
+        """
+        if self._role is None:
+            self._role = role
+        elif self._role != role:
+            raise RuntimeError(
+                f"EntityBuilder reused for multiple roles: {self._role} -> {role}"
+            )
 
     def ball(self, x: float, y: float) -> "EntityBuilder":
         """
@@ -25,6 +47,7 @@ class EntityBuilder:
             x (float): The x-coordinate of the ball's position.
             y (float): The y-coordinate of the ball's position.
         """
+        self._set_role(EntityRole.BALL)
         shape = Circle(radius=5)
         self.components += [
             Position(x=x, y=y),
@@ -50,6 +73,7 @@ class EntityBuilder:
             width (int): The width of the wall.
             height (int): The height of the wall.
         """
+        self._set_role(EntityRole.WALL)
         shape = Rect(width=width, height=height)
         self.components += [
             Position(x=x, y=y),
@@ -74,6 +98,7 @@ class EntityBuilder:
         Returns:
             int: The entity ID of the created hole.
         """
+        self._set_role(EntityRole.HOLE)
         shape = Circle(radius=15)
         self.components += [
             Position(x=x, y=y),
@@ -84,6 +109,9 @@ class EntityBuilder:
         return self
 
     def velocity(self, dx: float, dy: float) -> "EntityBuilder":
+        # Keep this strict: only valid while building a ball
+        if self._role not in (None, EntityRole.BALL):
+            raise RuntimeError("velocity() can only be used when building a ball")
         self.components.append(Velocity(dx=dx, dy=dy))
         return self
 
@@ -99,4 +127,6 @@ class EntityBuilder:
         for c in self.components:
             entity.add(c)
         self.components.clear()
+        # Safely reset the role for reuse
+        self._role = None
         return entity
