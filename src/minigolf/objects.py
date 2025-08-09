@@ -1,5 +1,6 @@
 from minigolf.components import (
     Collider,
+    Hole,
     PhysicsBody,
     Position,
     Renderable,
@@ -78,6 +79,7 @@ class EntityBuilder:
             Position(x=x, y=y),
             Collider(shape=shape),
             Renderable(colour=(91, 166, 0), shape=shape),
+            Hole(),
         ]
         return self
 
