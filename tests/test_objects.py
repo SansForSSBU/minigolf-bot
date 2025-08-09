@@ -1,4 +1,12 @@
-from minigolf.components import Collider, PhysicsBody, Position, Renderable, Velocity
+import pytest
+from minigolf.components import (
+    Collider,
+    Hole,
+    PhysicsBody,
+    Position,
+    Renderable,
+    Velocity,
+)
 from minigolf.objects import EntityBuilder
 from minigolf.world import World
 
@@ -126,3 +134,42 @@ def test_custom_ball_colour():
     e = EntityBuilder().ball(x=0, y=0).colour((123, 45, 67)).build()
     assert (rend := e.get(Renderable)) is not None
     assert rend.colour == (123, 45, 67)
+
+
+def test_builder_raises_when_mixing_roles_without_build():
+    b = EntityBuilder()
+    b.ball(0, 0).velocity(1, 2)
+    with pytest.raises(RuntimeError):
+        b.hole(10, 10)  # mixing roles before build must explode
+
+
+def test_velocity_only_valid_for_ball():
+    b = EntityBuilder()
+    b.hole(0, 0)
+    with pytest.raises(RuntimeError):
+        b.velocity(1, 2)
+
+
+def test_ball_does_not_add_hole_component():
+    e = EntityBuilder().ball(0, 0).build()
+    assert e.get(Hole) is None
+
+
+def test_hole_has_no_velocity_or_physics():
+    e = EntityBuilder().hole(0, 0).build()
+    assert e.get(Velocity) is None
+    assert e.get(PhysicsBody) is None
+
+
+def test_builder_role_resets_after_build():
+    b = EntityBuilder()
+    b.ball(0, 0).build()  # role locked to BALL, then reset
+    # should be allowed now
+    e = b.hole(10, 10).build()
+    assert e.get(Hole) is not None
+
+
+def test_colour_without_renderable_raises():
+    b = EntityBuilder()
+    with pytest.raises(RuntimeError):
+        b.colour((1, 2, 3))  # no Renderable yet
