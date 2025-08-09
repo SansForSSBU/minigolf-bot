@@ -73,7 +73,7 @@ class EntityBuilder:
         Returns:
             int: The entity ID of the created hole.
         """
-        shape = Circle(radius=10)
+        shape = Circle(radius=15)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
