@@ -26,13 +26,25 @@ def get_entity_at(world: World, x: int, y: int) -> Entity | None:
 
 def build_entity(tool: Tool, x: int, y: int) -> Entity | None:
     builder = EntityBuilder()
-    cx, cy = x + TILE_SIZE // 2, y + TILE_SIZE // 2
 
-    if tool == Tool.WALL:
-        return builder.wall(x, y, TILE_SIZE, TILE_SIZE).build()
-    elif tool == Tool.BALL:
-        # subtract radius (assuming 20x20)
-        return builder.ball(cx - 10, cy - 10).build()
-    elif tool == Tool.HOLE:
-        return builder.hole(cx - 10, cy - 10).build()
-    return None
+    # Snap click to grid cell, then use the cell centre
+    gx, gy = snap_to_grid(x, y)
+    cx, cy = gx + TILE_SIZE // 2, gy + TILE_SIZE // 2
+
+    match tool:
+        case Tool.WALL:
+            # Walls align with grid cells (top-left origin)
+            return builder.wall(gx, gy, TILE_SIZE, TILE_SIZE).build()
+        case Tool.BALL:
+            e = builder.ball(0, 0).build()
+        case Tool.HOLE:
+            e = builder.hole(0, 0).build()
+        case _:
+            return None
+
+    pos = e.get(components.Position)
+    if pos is None:
+        raise RuntimeError("Entity has no Position component")
+
+    pos.x, pos.y = cx, cy
+    return e
