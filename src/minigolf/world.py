@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from minigolf import components
 from minigolf.entity import Entity, PhysicsBody
+from minigolf.game.state import GameState
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -14,6 +15,7 @@ class World:
     def __init__(self):
         self._next_id: int = 0
         self.entities: dict[int, Entity] = {}
+        self.game_state: GameState = GameState.PLAYING
 
     def add_entity(self, entity: Entity) -> int:
         """
@@ -31,6 +33,15 @@ class World:
         entity = Entity()
         self.entities[eid] = entity
         return entity
+
+    def remove_entity(self, eid: int) -> None:
+        """
+        Remove an entity by its ID.
+        """
+        if eid in self.entities:
+            del self.entities[eid]
+        else:
+            raise KeyError(f"Entity with ID {eid} does not exist.")
 
     def get_balls(self):
         # TODO: The ball entity should have some unique tag associated with it but this will work for now
