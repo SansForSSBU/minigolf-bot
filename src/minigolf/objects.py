@@ -120,6 +120,10 @@ class EntityBuilder:
             if isinstance(comp, Renderable):
                 self.components[i] = Renderable(colour=rgb, shape=comp.shape)
                 break
+        else:
+            raise RuntimeError(
+                "colour() can only be used after adding a Renderable component"
+            )
         return self
 
     def build(self) -> Entity:
