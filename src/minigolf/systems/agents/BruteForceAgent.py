@@ -1,6 +1,7 @@
 import numpy as np
 from pymunk import ShapeFilter, Vec2d
 from minigolf.components import Name, Position
+import random
 
 NO_FILTER = ShapeFilter()
 WALL = 1
@@ -26,7 +27,7 @@ class BruteForceAgent:
         for x in range(GRID_SIZE):
             for y in range(GRID_SIZE):
                 point = (x, y)
-                results = self.physics_system.space.point_query(point, 0, NO_FILTER)
+                results = self.physics_system.space.point_query(point, 1, NO_FILTER)
                 for res in results:
                     if res and res.shape:
                         entity = res.shape.entity
@@ -77,7 +78,7 @@ class BruteForceAgent:
         else:
             return np.inf
 
-    def get_cost(self, shot):
+    def get_end_pos(self, shot):
         import copy
         # Deep copy the world and physics system to avoid affecting the real game
         world_copy = copy.deepcopy(self.world)
@@ -98,8 +99,9 @@ class BruteForceAgent:
             physics_copy.step()
             if pymunk_ball.body.velocity.length < STOPPING_VELOCITY:
                 break
-        ball_pos = ball_entity.get(Position)
-        return self.cost_fn((ball_pos.x, ball_pos.y))
+        pos = pymunk_ball.body.position
+        end_pos = (pos.x, pos.y)
+        return end_pos
 
     def print_calc_progress(self, idx, length):
         print(f"Calculating... {100*(idx/length)}%")
@@ -109,7 +111,9 @@ class BruteForceAgent:
         best_cost = np.inf
         for idx, shot in enumerate(POSSIBLE_SHOTS):
             self.print_calc_progress(idx, len(POSSIBLE_SHOTS))
-            cost = self.get_cost(shot)
+            end_pos = self.get_end_pos(shot)
+            print(end_pos)
+            cost = self.cost_fn(end_pos)
             if cost < best_cost:
                 best_cost = cost
                 best_shot = shot
