@@ -1,10 +1,16 @@
 import numpy as np
-from pymunk import ShapeFilter
+from pymunk import ShapeFilter, Vec2d
 from minigolf.components import Name, Position
 
 NO_FILTER = ShapeFilter()
 WALL = 1
 GRID_SIZE = 1000
+# Generate a set of sensible shots: directions every 15 degrees, speeds from 100 to 600 in steps of 100, spin 0 only
+POSSIBLE_SHOTS = [
+    [Vec2d(speed * np.cos(theta), speed * np.sin(theta)), 0.0]
+    for speed in range(100, 700, 100)
+    for theta in np.linspace(0, 2 * np.pi, 24, endpoint=False)
+]
 
 
 class BruteForceAgent:
@@ -40,11 +46,12 @@ class BruteForceAgent:
         costs = np.full((GRID_SIZE, GRID_SIZE), np.inf)
         visited = np.zeros((GRID_SIZE, GRID_SIZE), dtype=bool)
         from heapq import heappush, heappop
+
         heap = []
         # Dijkstra: start from hole, cost 0
         costs[hole_x, hole_y] = 0
         heappush(heap, (0, hole_x, hole_y))
-        directions = [(-1,0),(1,0),(0,-1),(0,1)]
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         while heap:
             cost, x, y = heappop(heap)
             if visited[x, y]:
@@ -62,6 +69,17 @@ class BruteForceAgent:
         self._costs = costs
         return costs
 
-    def make_move(self):
+    def get_cost(self, shot):
         cost = self.pathfind()
-        pass
+        # Simulate the shot and get the cost.
+        return 1
+
+    def make_move(self):
+        best_shot = None
+        best_cost = np.inf
+        for shot in POSSIBLE_SHOTS:
+            cost = self.get_cost(shot)
+            if cost < best_cost:
+                best_cost = cost
+                best_shot = shot
+        return best_shot
