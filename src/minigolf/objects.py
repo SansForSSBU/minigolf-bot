@@ -37,7 +37,7 @@ class EntityBuilder:
             ),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),
-            Name(name="ball")
+            Name(name="ball"),
         ]
         return self
 
@@ -62,7 +62,7 @@ class EntityBuilder:
                 friction=DEFAULT_WALL_FRICTION,
                 anchored=True,
             ),
-            Name(name="wall")
+            Name(name="wall"),
         ]
         return self
 
@@ -81,7 +81,7 @@ class EntityBuilder:
             Position(x=x, y=y),
             Collider(shape=shape),
             Renderable(colour=(91, 166, 0), shape=shape),
-            Name(name="hole")
+            Name(name="hole"),
         ]
         return self
 
