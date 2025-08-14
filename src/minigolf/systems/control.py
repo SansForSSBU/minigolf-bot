@@ -1,9 +1,10 @@
 from pymunk import Vec2d
-from minigolf.systems.agents.DefaultMovesAgent import DefaultMovesAgent
-# from minigolf.systems.agents.BruteForceAgent import BruteForceAgent
+
+# from minigolf.systems.agents.DefaultMovesAgent import DefaultMovesAgent
+from minigolf.systems.agents.BruteForceAgent import BruteForceAgent
 
 STOPPING_VELOCITY = 10.0
-AGENT = DefaultMovesAgent
+AGENT = BruteForceAgent
 
 
 class ControlSystem:
