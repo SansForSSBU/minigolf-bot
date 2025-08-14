@@ -38,6 +38,10 @@ class World:
         return [
             entity for entity in physics_bodies if not entity.get(PhysicsBody).anchored
         ]
+    
+    def get_holes(self):
+        hole_entities = [e for e in self.entities.values() if e.get(components.Name) and e.get(components.Name).name == "hole"]
+        return hole_entities
 
     def get_entity(self, eid: int) -> Entity:
         return self.entities[eid]

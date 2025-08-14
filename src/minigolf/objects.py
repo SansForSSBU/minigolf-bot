@@ -6,6 +6,7 @@ from minigolf.components import (
     Rect,
     Circle,
     Velocity,
+    Name,
 )
 from minigolf.entity import Entity
 from pydantic import BaseModel
@@ -36,6 +37,7 @@ class EntityBuilder:
             ),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),
+            Name(name="ball")
         ]
         return self
 
@@ -60,6 +62,7 @@ class EntityBuilder:
                 friction=DEFAULT_WALL_FRICTION,
                 anchored=True,
             ),
+            Name(name="wall")
         ]
         return self
 
@@ -78,6 +81,7 @@ class EntityBuilder:
             Position(x=x, y=y),
             Collider(shape=shape),
             Renderable(colour=(91, 166, 0), shape=shape),
+            Name(name="hole")
         ]
         return self
 

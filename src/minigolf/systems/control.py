@@ -8,8 +8,9 @@ AGENT = BruteForceAgent
 
 
 class ControlSystem:
-    def __init__(self, ball, world):
-        self.agent = AGENT(world, ball)
+    def __init__(self, ball, world, physics_system):
+        self.agent = AGENT(world, ball, physics_system)
+        self.physics_system = physics_system
         self.world = world
         self.ball = ball
 

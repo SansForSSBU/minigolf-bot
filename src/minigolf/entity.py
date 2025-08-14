@@ -37,6 +37,7 @@ class PhysicsObject:
 
         shape.elasticity = DEFAULT_ELASTICITY
         shape.friction = DEFAULT_WALL_FRICTION
+        shape.entity = entity
 
         return cls(entity, body, shape)
 

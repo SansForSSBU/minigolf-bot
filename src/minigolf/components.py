@@ -72,3 +72,6 @@ class PhysicsBody(BaseModel):
 class Renderable(BaseModel):
     colour: tuple[int, int, int]
     shape: Shape
+
+class Name(BaseModel):
+    name: str
