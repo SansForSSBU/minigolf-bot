@@ -1,19 +1,21 @@
 from pymunk import Vec2d
 from minigolf.systems.agents.DefaultMovesAgent import DefaultMovesAgent
+# from minigolf.systems.agents.BruteForceAgent import BruteForceAgent
 
 STOPPING_VELOCITY = 10.0
-AGENT = DefaultMovesAgent()
+AGENT = DefaultMovesAgent
 
 
 class ControlSystem:
-    def __init__(self, ball, agent=None):
-        self.agent = AGENT
+    def __init__(self, ball, world):
+        self.agent = AGENT(world, ball)
+        self.world = world
         self.ball = ball
 
     def step(self):
         if self.ball.body.velocity.length < STOPPING_VELOCITY:
             self.stop_ball()
-            next_move = AGENT.make_move()
+            next_move = self.agent.make_move()
             if next_move is not None:
                 self.ball.body.velocity = next_move[0]
                 self.ball.body.angular_velocity = next_move[1]
