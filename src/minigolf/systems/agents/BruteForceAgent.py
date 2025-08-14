@@ -69,15 +69,46 @@ class BruteForceAgent:
         self._costs = costs
         return costs
 
+    def cost_fn(self, pos):
+        costs = self.pathfind()
+        x, y = int(pos[0]), int(pos[1])
+        if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+            return costs[x, y]
+        else:
+            return np.inf
+
     def get_cost(self, shot):
-        cost = self.pathfind()
-        # Simulate the shot and get the cost.
-        return 1
+        import copy
+        # Deep copy the world and physics system to avoid affecting the real game
+        world_copy = copy.deepcopy(self.world)
+        physics_copy = copy.deepcopy(self.physics_system)
+        # Find the ball in the copied world/physics
+        balls = world_copy.get_balls()
+        if not balls:
+            return np.inf  # No ball found
+        ball_entity = balls[0]
+        pymunk_ball = physics_copy.eid_to_body[ball_entity.id]
+        # Set ball velocity for this shot
+        pymunk_ball.body.velocity = shot[0]
+        pymunk_ball.body.angular_velocity = shot[1]
+        # Simulate until stop or max steps
+        MAX_STEPS = 1000000
+        STOPPING_VELOCITY = 10.0
+        for _ in range(MAX_STEPS):
+            physics_copy.step()
+            if pymunk_ball.body.velocity.length < STOPPING_VELOCITY:
+                break
+        ball_pos = ball_entity.get(Position)
+        return self.cost_fn((ball_pos.x, ball_pos.y))
+
+    def print_calc_progress(self, idx, length):
+        print(f"Calculating... {100*(idx/length)}%")
 
     def make_move(self):
         best_shot = None
         best_cost = np.inf
-        for shot in POSSIBLE_SHOTS:
+        for idx, shot in enumerate(POSSIBLE_SHOTS):
+            self.print_calc_progress(idx, len(POSSIBLE_SHOTS))
             cost = self.get_cost(shot)
             if cost < best_cost:
                 best_cost = cost
