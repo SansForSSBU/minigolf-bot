@@ -9,7 +9,7 @@ GRID_SIZE = 1000
 # Generate a set of sensible shots: directions every 15 degrees, speeds from 100 to 600 in steps of 100, spin 0 only
 POSSIBLE_SHOTS = [
     [Vec2d(speed * np.cos(theta), speed * np.sin(theta)), 0.0]
-    for speed in range(100, 700, 100)
+    for speed in [10, 30] + list(range(100, 700, 100))
     for theta in np.linspace(0, 2 * np.pi, 24, endpoint=False)
 ]
 
@@ -80,6 +80,7 @@ class BruteForceAgent:
 
     def get_end_pos(self, shot):
         import copy
+
         # Deep copy the world and physics system to avoid affecting the real game
         world_copy = copy.deepcopy(self.world)
         physics_copy = copy.deepcopy(self.physics_system)
@@ -104,7 +105,7 @@ class BruteForceAgent:
         return end_pos
 
     def print_calc_progress(self, idx, length):
-        print(f"Calculating... {100*(idx/length)}%")
+        print(f"Calculating... {100 * (idx / length)}%")
 
     def make_move(self):
         best_shot = None
