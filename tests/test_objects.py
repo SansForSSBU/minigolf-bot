@@ -1,4 +1,5 @@
 import pytest
+
 from minigolf.components import (
     Collider,
     Hole,

@@ -44,7 +44,8 @@ class World:
             raise KeyError(f"Entity with ID {eid} does not exist.")
 
     def get_balls(self):
-        # TODO: The ball entity should have some unique tag associated with it but this will work for now
+        # TODO: The ball entity should have some unique tag associated with it
+        # TODO: this will work for now
         physics_bodies = self.all_with(components.PhysicsBody)
         return [
             entity for entity in physics_bodies if not entity.get(PhysicsBody).anchored

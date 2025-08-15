@@ -1,9 +1,9 @@
 import pymunk
 
 from minigolf.components import Collider
+from minigolf.constants import DEFAULT_FLOOR_FRICTION
 from minigolf.entity import Entity, PhysicsObject
 from minigolf.world import World
-from minigolf.constants import DEFAULT_FLOOR_FRICTION
 
 
 class PhysicsSpace:

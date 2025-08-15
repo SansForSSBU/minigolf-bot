@@ -1,17 +1,18 @@
 from enum import Enum
+from typing import TYPE_CHECKING
+
 from minigolf.components import (
+    Circle,
     Collider,
     Hole,
     PhysicsBody,
     Position,
-    Renderable,
     Rect,
-    Circle,
+    Renderable,
     Velocity,
 )
-from minigolf.entity import Entity
 from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
-from typing import TYPE_CHECKING
+from minigolf.entity import Entity
 
 if TYPE_CHECKING:
     from pydantic import BaseModel

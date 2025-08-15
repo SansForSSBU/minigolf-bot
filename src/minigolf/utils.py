@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from minigolf.components import Shape, Position
+    from minigolf.components import Position, Shape
 
 
 def add_tuples(a, b) -> tuple:

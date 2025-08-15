@@ -1,8 +1,8 @@
 from minigolf import components
+from minigolf.editor.consts import Tool
 from minigolf.entity import Entity
 from minigolf.objects import EntityBuilder
 from minigolf.world import World
-from minigolf.editor.consts import Tool
 
 TILE_SIZE = 50
 

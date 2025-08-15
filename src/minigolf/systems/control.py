@@ -1,4 +1,5 @@
 from pymunk import Vec2d
+
 from minigolf.constants import DEFAULT_MOVES
 
 STOPPING_VELOCITY = 10.0

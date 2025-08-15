@@ -1,9 +1,11 @@
-import pytest
+from unittest.mock import MagicMock, patch
+
 import pygame
-from unittest.mock import patch, MagicMock
-from minigolf.systems.rendering import render_system
-from minigolf.components import Position, Renderable, Rect, Circle
+import pytest
+
+from minigolf.components import Circle, Position, Rect, Renderable
 from minigolf.entity import Entity
+from minigolf.systems.rendering import render_system
 from minigolf.world import World
 
 

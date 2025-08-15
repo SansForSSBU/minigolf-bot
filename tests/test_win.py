@@ -1,8 +1,9 @@
 import math
-from minigolf.world import World
+
+from minigolf.components import Circle, Collider
 from minigolf.objects import EntityBuilder
-from minigolf.components import Collider, Circle
-from minigolf.systems.win import win_condition_system, VELOCITY_THRESHOLD
+from minigolf.systems.win import VELOCITY_THRESHOLD, win_condition_system
+from minigolf.world import World
 
 
 def _add_ball(world: World, x: float, y: float, dx: float = 0, dy: float = 0):

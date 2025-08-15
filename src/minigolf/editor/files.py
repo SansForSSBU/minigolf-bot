@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from loguru import logger
 from pygame_gui.elements import UITextEntryLine
 

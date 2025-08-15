@@ -1,13 +1,16 @@
 """
 Levels for the minigolf game.
 
-To export a level, use the `World.to_json` method to save the world state to a JSON file.
+To export a level, use the `World.to_json` method.
+This saves the world state to a JSON file.
 """
 
-from loguru import logger
-from minigolf.world import World
-from minigolf.objects import EntityBuilder
 from pathlib import Path
+
+from loguru import logger
+
+from minigolf.objects import EntityBuilder
+from minigolf.world import World
 
 
 def create_level1(world: World) -> None:

@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from minigolf.components import Circle, Position, Velocity, Collider, Hole
-from minigolf.world import World
-from minigolf.entity import Entity
+
 from loguru import logger
+
+from minigolf.components import Circle, Collider, Hole, Position, Velocity
+from minigolf.entity import Entity
+from minigolf.world import World
 
 VELOCITY_THRESHOLD = 2.0
 
@@ -23,7 +25,7 @@ def win_condition_system(world: World) -> WinEvent | None:
     """
     Returns a WinEvent if the win condition is met, otherwise None.
 
-    The win condition is met when a ball enters a hole with a velocity below a threshold.
+    The win condition is met when a ball enters a hole with velocity below a threshold.
 
     Contract:
         - There must be exactly one ball in the world.
@@ -69,7 +71,8 @@ def win_condition_system(world: World) -> WinEvent | None:
 
     if in_hole and slow:
         logger.debug(
-            f"Win condition met: Ball {ball.id} in Hole {hole.id} with distance {dist2**0.5} and speed {speed2**0.5}"
+            f"Win condition met: Ball {ball.id}"
+            f"in Hole {hole.id} with distance {dist2**0.5} and speed {speed2**0.5}"
         )
         return WinEvent(ball.id, hole.id, dist2**0.5, speed2**0.5)
     return None
