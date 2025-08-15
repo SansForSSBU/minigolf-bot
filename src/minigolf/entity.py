@@ -56,7 +56,7 @@ class Entity:
         self.components[type(component)] = component
 
     def get(self, cls: type[T]) -> T | None:
-        return cast(T | None, self.components.get(cls))
+        return cast("T | None", self.components.get(cls))
 
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components

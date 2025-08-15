@@ -10,8 +10,11 @@ from minigolf.components import (
     Velocity,
 )
 from minigolf.entity import Entity
-from pydantic import BaseModel
 from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 
 class EntityRole(str, Enum):

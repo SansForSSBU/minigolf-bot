@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
+from typing import TYPE_CHECKING
+
 import pygame
 import pygame_gui
-
 from loguru import logger
 
 from minigolf.editor.consts import TOOL_KEYS, Tool
 from minigolf.editor.files import get_filename
 from minigolf.editor.grid import build_entity, get_entity_at, snap_to_grid
-from minigolf.editor.state import State
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.world import World
+
+if TYPE_CHECKING:
+    from minigolf.editor.state import State
 
 
 def handle_event(event: pygame.event.Event, state: State) -> None:
