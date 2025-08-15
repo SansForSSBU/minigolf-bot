@@ -40,7 +40,7 @@ def main_loop(world: World) -> None:
         raise ValueError("World should only have 1 ball")
 
     ball_body = physics_system.eid_to_body[balls[0].id]
-    control_system = ControlSystem(ball_body)
+    control_system = ControlSystem(ball_body, world, physics_system)
     clock = pygame.time.Clock()
 
     start_ticks = pygame.time.get_ticks()
