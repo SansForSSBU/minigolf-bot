@@ -43,7 +43,7 @@ class EntityBuilder:
                 f"EntityBuilder reused for multiple roles: {self._role} -> {role}"
             )
 
-    def ball(self, x: float, y: float) -> "EntityBuilder":
+    def ball(self, x: float, y: float, radius: int = 5) -> "EntityBuilder":
         """
         Create a ball entity with specified position.
 
@@ -52,7 +52,7 @@ class EntityBuilder:
             y (float): The y-coordinate of the ball's position.
         """
         self._set_role(EntityRole.BALL)
-        shape = Circle(radius=5)
+        shape = Circle(radius=radius)
         self.components += [
             Position(x=x, y=y),
             Velocity(dx=0, dy=0),
@@ -92,7 +92,7 @@ class EntityBuilder:
         ]
         return self
 
-    def hole(self, x: float, y: float) -> "EntityBuilder":
+    def hole(self, x: float, y: float, radius=15) -> "EntityBuilder":
         """
         Create a hole entity with specified position.
 
@@ -103,7 +103,7 @@ class EntityBuilder:
             int: The entity ID of the created hole.
         """
         self._set_role(EntityRole.HOLE)
-        shape = Circle(radius=15)
+        shape = Circle(radius=radius)
         self.components += [
             Position(x=x, y=y),
             Collider(shape=shape),
