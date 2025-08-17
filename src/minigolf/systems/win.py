@@ -3,14 +3,20 @@ from dataclasses import dataclass
 from loguru import logger
 
 from minigolf.components import Circle, Collider, Hole, Position, Velocity
+from minigolf.constants import (
+    FUNNEL_DAMPING,
+    FUNNEL_RADIUS,
+    FUNNEL_STRENGTH,
+    VELOCITY_THRESHOLD,
+)
 from minigolf.entity import Entity
 from minigolf.world import World
-
-VELOCITY_THRESHOLD = 2.0
 
 
 @dataclass(frozen=True)
 class WinEvent:
+    """Represents a single ball sinking into the hole."""
+
     ball_eid: int
     hole_eid: int
     distance: float
@@ -18,61 +24,122 @@ class WinEvent:
 
 
 def _first(world: World, *types) -> Entity | None:
+    """Return the first entity matching all given component types, or None."""
     return next((e for e in world.all_with(*types)), None)
 
 
-def win_condition_system(world: World) -> WinEvent | None:
+def apply_funnel(
+    ball: Entity,
+    hole: Entity,
+    radius: float = FUNNEL_RADIUS,
+    strength: float = FUNNEL_STRENGTH,
+    damping: float = FUNNEL_DAMPING,
+) -> None:
     """
-    Returns a WinEvent if the win condition is met, otherwise None.
+    Funnel mechanic:
+    - If a ball is within `radius` of the hole centre, apply a gentle force
+      nudging it toward the hole.
+    - Force is proportional to distance, direction is normalised toward hole.
+    - Damping reduces velocity each step so it doesn’t spiral endlessly.
+    """
+    ball_pos, ball_vel = ball.get(Position), ball.get(Velocity)
+    hole_pos = hole.get(Position)
 
-    The win condition is met when a ball enters a hole with velocity below a threshold.
+    dx, dy = hole_pos.x - ball_pos.x, hole_pos.y - ball_pos.y
+    dist2 = dx * dx + dy * dy
+    if dist2 > radius * radius:
+        return  # outside funnel zone, do nothing
 
-    Contract:
-        - There must be exactly one ball in the world.
-        - There must be exactly one hole in the world.
-        - The ball must be moving slowly enough when it enters the hole.
+    dist = dist2**0.5
+    if dist < 1e-6:
+        return  # already at hole centre (avoid divide by zero)
+
+    # Normalised direction vector pointing ball → hole
+    nx, ny = dx / dist, dy / dist
+
+    # Update velocity with funnel pull + damping
+    ball_vel.dx = ball_vel.dx * damping + nx * strength * dist
+    ball_vel.dy = ball_vel.dy * damping + ny * strength * dist
+
+
+def win_condition_system(world: World) -> list[WinEvent]:
+    """
+    Check if balls have been sunk into the hole.
+
+    Behaviour:
+    - Funnel: any ball within a funnel radius is gently pulled toward hole centre.
+    - Win: a ball counts as sunk when:
+        1. Ball + hole colliders overlap (distance ≤ combined radii).
+        2. Ball is moving slower than VELOCITY_THRESHOLD.
+    - On win: ball is snapped to hole centre and frozen.
+    - Multiple balls are supported: return a list of WinEvent, possibly empty.
+
+    Contracts:
+    - Exactly one hole must exist.
+    - Hole collider must be a Circle.
     """
     hole = _first(world, Hole, Position, Collider)
     if not hole or hole.id is None:
         logger.error("No hole found in the world")
-        return None
+        return []
 
-    balls = world.get_balls()
+    hole_pos = hole.get(Position)
+    hole_col = hole.get(Collider)
 
-    if len(balls) != 1:
-        logger.error("Win condition check failed: no hole or multiple balls")
-        return None
+    if hole_col is None or not isinstance(hole_col.shape, Circle):
+        logger.error("Hole collider missing or not a Circle")
+        return []
 
-    ball = balls[0]
+    hole_radius = hole_col.shape.radius
+    funnel_extra = 40.0  # extra reach beyond hole radius for funnel effect
 
-    hp, hc = hole.get(Position), hole.get(Collider)
-    bp, bv = ball.get(Position), ball.get(Velocity)
+    events: list[WinEvent] = []
+    for ball in world.get_balls():
+        ball_pos = ball.get(Position)
+        ball_vel = ball.get(Velocity)
+        ball_col = ball.get(Collider)
 
-    if not (
-        isinstance(hp, Position)
-        and isinstance(bp, Position)
-        and isinstance(hc, Collider)
-        and isinstance(bv, Velocity)
-    ):
-        logger.error("Invalid components for win condition check")
-        return None
+        if not (
+            isinstance(ball_pos, Position)
+            and isinstance(ball_vel, Velocity)
+            and isinstance(ball_col, Collider)
+        ):
+            continue
+        if ball_col.shape is None or not isinstance(ball_col.shape, Circle):
+            continue
+        if ball.id is None or hole.id is None:
+            continue
 
-    if not isinstance(hc.shape, Circle):
-        logger.error("Hole shape is not a Circle")
-        return None
+        dx, dy = ball_pos.x - hole_pos.x, ball_pos.y - hole_pos.y
+        dist2 = dx * dx + dy * dy
+        dist = dist2**0.5
 
-    dx, dy = bp.x - hp.x, bp.y - hp.y
-    dist2 = dx * dx + dy * dy
-    r = hc.shape.radius
-    in_hole = dist2 <= r * r
+        ball_radius = ball_col.shape.radius
+        speed = (ball_vel.dx * ball_vel.dx + ball_vel.dy * ball_vel.dy) ** 0.5
 
-    speed2 = bv.dx * bv.dx + bv.dy * bv.dy
-    slow = speed2 <= VELOCITY_THRESHOLD * VELOCITY_THRESHOLD
+        # Funnel zone check
+        if dist2 <= (hole_radius + ball_radius + funnel_extra) ** 2:
+            apply_funnel(ball, hole)
 
-    if in_hole and slow:
-        logger.debug(
-            f"Win condition met: Ball {ball.id}"
-            f"in Hole {hole.id} with distance {dist2**0.5} and speed {speed2**0.5}"
-        )
-        return WinEvent(ball.id, hole.id, dist2**0.5, speed2**0.5)
-    return None
+        # Win condition check
+        in_hole = dist2 <= (hole_radius + ball_radius) ** 2
+        slow_enough = (
+            ball_vel.dx * ball_vel.dx + ball_vel.dy * ball_vel.dy
+        ) <= VELOCITY_THRESHOLD**2
+
+        if in_hole:
+            logger.debug(
+                f"[HoleEntry] Ball {ball.id} entered Hole {hole.id} "
+                f"dist={dist:.2f}, speed={speed:.2f}"
+            )
+            if slow_enough:
+                logger.info(
+                    f"[Win] Ball {ball.id} captured in Hole {hole.id} "
+                    f"dist={dist:.2f}, speed={speed:.2f}"
+                )
+                # Snap ball to hole centre and freeze
+                ball_pos.x, ball_pos.y = hole_pos.x, hole_pos.y
+                ball_vel.dx, ball_vel.dy = 0.0, 0.0
+                events.append(WinEvent(ball.id, hole.id, dist, speed))
+
+    return events
