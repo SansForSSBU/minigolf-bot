@@ -1,3 +1,5 @@
+from functools import cache
+
 import networkx as nx
 import numpy as np
 from pymunk import ShapeFilter, Vec2d
@@ -25,7 +27,7 @@ class BruteForceAgent:
         self.physics_system = physics_system
         self._costs = None
 
-    def get_wall_pixels(self):
+    def get_map_grid(self):
         # Create a 1000x1000 grid to store occupancy (1 if occupied, 0 if free)
         occupancy = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.uint8)
         for x in range(GRID_SIZE):
@@ -39,25 +41,22 @@ class BruteForceAgent:
                             occupancy[x, y] = WALL
         return occupancy
 
+    @cache
     def pathfind(self):
-        if self._costs is not None:
-            return self._costs
-        wall_pixels = self.get_wall_pixels()
+        wall_pixels = self.get_map_grid()
         holes = self.world.get_holes()
-        # Assume only 1 hole
+        if len(holes) != 1:
+            raise ValueError("World should have exactly one hole")
         hole = holes[0]
-        hole_pos = hole.get(Position)
-        hole_x, hole_y = int(hole_pos.x), int(hole_pos.y)
-        rows, cols = wall_pixels.shape
-        G = nx.grid_2d_graph(rows, cols)
+        hole_pos = (int(hole.get(Position).x), int(hole.get(Position).y))
+        G = nx.grid_2d_graph(*wall_pixels.shape)
         for r, c in np.argwhere(wall_pixels == 1):
             G.remove_node((r, c))
-        lengths = nx.single_source_shortest_path_length(G, (hole_x, hole_y))
-        # TODO: Make nx return it as np array to avoid this annoying conversion.
-        costs = np.full((rows, cols), np.inf)
-        for (x, y), cost in lengths.items():
+        dict_costs = nx.single_source_shortest_path_length(G, hole_pos)
+        # TODO: Make nx return it as np array to avoid this annoying conversion
+        costs = np.full(wall_pixels.shape, np.inf)
+        for (x, y), cost in dict_costs.items():
             costs[x, y] = cost
-        self._costs = costs
         return costs
 
     def cost_fn(self, pos):
