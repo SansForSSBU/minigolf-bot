@@ -4,7 +4,7 @@ import pymunk
 from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
-from minigolf.constants import BALL_MOMENT, DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
+from minigolf.consts import BALL_MOMENT, DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 from minigolf.utils import from_pymunk_position, to_pymunk_position
 
 T = TypeVar("T", bound=BaseModel)

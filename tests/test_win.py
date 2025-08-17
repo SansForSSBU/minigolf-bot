@@ -2,7 +2,7 @@
 import math
 
 from minigolf.components import Circle, Collider
-from minigolf.constants import STOPPING_VELOCITY, VELOCITY_THRESHOLD
+from minigolf.consts import STOPPING_VELOCITY, VELOCITY_THRESHOLD
 from minigolf.objects import EntityBuilder
 from minigolf.systems.win import win_condition_system
 from minigolf.world import World

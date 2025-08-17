@@ -11,7 +11,7 @@ from minigolf.components import (
     Renderable,
     Velocity,
 )
-from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
+from minigolf.consts import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 from minigolf.entity import Entity
 
 if TYPE_CHECKING:

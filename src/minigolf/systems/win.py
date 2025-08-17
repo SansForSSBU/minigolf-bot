@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from loguru import logger
 
 from minigolf.components import Circle, Collider, Hole, Position, Velocity
-from minigolf.constants import (
+from minigolf.consts import (
     FUNNEL_DAMPING,
     FUNNEL_RADIUS,
     FUNNEL_STRENGTH,

@@ -6,7 +6,7 @@ import pygame
 from loguru import logger
 
 from minigolf.components import Mode
-from minigolf.constants import SIMULATION_SPEED
+from minigolf.consts import SIMULATION_SPEED
 from minigolf.controllers import SequenceController
 from minigolf.game.engine import Game
 from minigolf.game.levels import create_level1

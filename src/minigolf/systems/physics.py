@@ -2,7 +2,7 @@ import pymunk
 from loguru import logger
 
 from minigolf.components import Collider
-from minigolf.constants import DEFAULT_FLOOR_FRICTION
+from minigolf.consts import DEFAULT_FLOOR_FRICTION
 from minigolf.entity import Entity, PhysicsObject
 from minigolf.world import World
 

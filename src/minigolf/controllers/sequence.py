@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from loguru import logger
 
 from minigolf.components import Action
-from minigolf.constants import DEFAULT_MOVES
+from minigolf.consts import DEFAULT_MOVES
 from minigolf.controllers import Controller
 from minigolf.world import World
 

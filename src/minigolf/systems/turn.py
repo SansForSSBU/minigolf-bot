@@ -17,7 +17,7 @@ from loguru import logger
 from pymunk import Vec2d
 
 from minigolf.components import Action, Phase, Player, TurnState, Velocity
-from minigolf.constants import STOPPING_VELOCITY
+from minigolf.consts import STOPPING_VELOCITY
 from minigolf.entity import Entity
 from minigolf.world import World
 
