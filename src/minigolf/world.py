@@ -67,6 +67,10 @@ class World:
             e for e in self.entities.values() if all(t in e.components for t in types)
         ]
 
+    def deep_clone(self) -> "World":
+        data = self.to_json_dict()
+        return World.from_json_dict(data)
+
     def to_json_dict(self) -> dict[str, Any]:
         out: dict[str, dict[str, Any]] = {}
 
