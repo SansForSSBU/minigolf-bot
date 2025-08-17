@@ -28,18 +28,19 @@ class BruteForceAgent:
         self._costs = None
 
     def get_map_grid(self):
-        # Create a 1000x1000 grid to store occupancy (1 if occupied, 0 if free)
-        occupancy = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.uint8)
-        for x in range(GRID_SIZE):
-            for y in range(GRID_SIZE):
-                point = (x, y)
-                results = self.physics_system.space.point_query(point, 1, NO_FILTER)
-                for res in results:
-                    if res and res.shape:
-                        entity = res.shape.entity
-                        if entity.get(Name).name == "wall":
-                            occupancy[x, y] = WALL
-        return occupancy
+        # TODO: Speed up by assuming empty and iterating over collider boxes to fill in
+        def is_wall(point):
+            results = self.physics_system.space.point_query(point, 1, NO_FILTER)
+            for res in results:
+                if res and res.shape:
+                    entity = res.shape.entity
+                    if entity.get(Name).name == "wall":
+                        return WALL
+            return 0
+
+        points = [(x, y) for x in range(GRID_SIZE) for y in range(GRID_SIZE)]
+        occupancy_flat = list(map(is_wall, points))
+        return np.array(occupancy_flat, dtype=np.uint8).reshape((GRID_SIZE, GRID_SIZE))
 
     @cache
     def pathfind(self):
