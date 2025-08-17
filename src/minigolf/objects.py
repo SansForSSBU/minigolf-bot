@@ -5,6 +5,7 @@ from minigolf.components import (
     Circle,
     Collider,
     Hole,
+    Name,
     PhysicsBody,
     Position,
     Rect,
@@ -64,6 +65,7 @@ class EntityBuilder:
             ),
             Collider(shape=shape),
             Renderable(colour=(255, 255, 255), shape=shape),
+            Name(name="ball"),
         ]
         return self
 
@@ -89,6 +91,7 @@ class EntityBuilder:
                 friction=DEFAULT_WALL_FRICTION,
                 anchored=True,
             ),
+            Name(name="wall"),
         ]
         return self
 
@@ -109,6 +112,7 @@ class EntityBuilder:
             Collider(shape=shape),
             Renderable(colour=(91, 166, 0), shape=shape),
             Hole(),
+            Name(name="hole"),
         ]
         return self
 

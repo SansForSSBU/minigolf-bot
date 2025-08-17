@@ -51,6 +51,14 @@ class World:
             entity for entity in physics_bodies if not entity.get(PhysicsBody).anchored
         ]
 
+    def get_holes(self):
+        hole_entities = [
+            e
+            for e in self.entities.values()
+            if e.get(components.Name) and e.get(components.Name).name == "hole"
+        ]
+        return hole_entities
+
     def get_entity(self, eid: int) -> Entity:
         return self.entities[eid]
 
@@ -58,6 +66,10 @@ class World:
         return [
             e for e in self.entities.values() if all(t in e.components for t in types)
         ]
+
+    def deep_clone(self) -> "World":
+        data = self.to_json_dict()
+        return World.from_json_dict(data)
 
     def to_json_dict(self) -> dict[str, Any]:
         out: dict[str, dict[str, Any]] = {}

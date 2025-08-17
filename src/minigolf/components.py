@@ -100,3 +100,7 @@ class Renderable(BaseModel):
 
 class Hole(BaseModel):
     pass
+
+
+class Name(BaseModel):
+    name: str
