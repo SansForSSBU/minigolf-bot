@@ -95,7 +95,15 @@ class BruteForceAgent:
         return (shot, end_pos)
 
     def print_calc_progress(self, idx, length):
-        print(f"Calculating... {100 * (idx / length)}%")
+        percent = 100 * (idx / length)
+        bar_length = 40
+        filled_length = int(bar_length * idx // length)
+        bar = "=" * filled_length + "-" * (bar_length - filled_length)
+        print(
+            f"\rProgress: |{bar}| {percent:.1f}% ({idx}/{length})", end="", flush=True
+        )
+        if idx == length:
+            print()  # Move to next line when done
 
     def make_move(self):
         shot_evals = []
@@ -104,7 +112,6 @@ class BruteForceAgent:
             futures = [
                 executor.submit(self.get_end_pos, shot) for shot in POSSIBLE_SHOTS
             ]
-            # Pathfind on main thread while our minions find end positions
             total = len(futures)
             for idx, future in enumerate(as_completed(futures), 1):
                 result = future.result()
