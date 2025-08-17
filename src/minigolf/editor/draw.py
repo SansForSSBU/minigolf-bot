@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pygame
 
-from minigolf.editor.state import State
-from minigolf.systems.rendering import render_system
-from minigolf.editor.grid import snap_to_grid
 from minigolf.editor.consts import TOOL_PREVIEW_COLOURS
+from minigolf.editor.grid import snap_to_grid
+from minigolf.systems.rendering import render_system
+
+if TYPE_CHECKING:
+    from minigolf.editor.state import State
 
 
 def draw_everything(screen: pygame.Surface, state: State) -> None:

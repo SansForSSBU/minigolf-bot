@@ -26,10 +26,19 @@ minigolf-editor = "minigolf.editor.main:cli"
 [tool.uv]
 package = true
 
+[tool.ruff]
+lint.select = [
+    "F",   # pyflakes
+    "E",   # pycodestyle
+    "I",   # import sorting
+    "TCH", # type-checking rules
+]
+
 [dependency-groups]
 dev = [
     "pre-commit>=4.2.0",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
+    "pytest-sugar>=1.0.0",
     "ruff>=0.12.7",
 ]

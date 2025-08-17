@@ -1,7 +1,7 @@
 from pymunk import Vec2d
 
-from minigolf.systems.agents.DefaultMovesAgent import DefaultMovesAgent
 from minigolf.systems.agents.BruteForceAgent import BruteForceAgent
+from minigolf.systems.agents.DefaultMovesAgent import DefaultMovesAgent
 
 agents = {"default": DefaultMovesAgent, "brute_force": BruteForceAgent}
 

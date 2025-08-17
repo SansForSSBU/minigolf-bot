@@ -4,8 +4,8 @@ import pymunk
 from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
+from minigolf.constants import BALL_MOMENT, DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 from minigolf.utils import from_pymunk_position, to_pymunk_position
-from minigolf.constants import DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION, BALL_MOMENT
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -57,7 +57,7 @@ class Entity:
         self.components[type(component)] = component
 
     def get(self, cls: type[T]) -> T | None:
-        return cast(T | None, self.components.get(cls))
+        return cast("T | None", self.components.get(cls))
 
     def has(self, component_type: type[BaseModel]) -> bool:
         return component_type in self.components

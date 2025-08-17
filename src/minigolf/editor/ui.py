@@ -1,8 +1,8 @@
 import pygame
 from pygame_gui.elements import UIButton, UILabel, UIPanel, UITextEntryLine
 
+from minigolf.editor.consts import TOOL_NAMES, Tool
 from minigolf.editor.state import State
-from minigolf.editor.consts import Tool, TOOL_NAMES
 
 
 def setup_ui(state: State) -> None:

@@ -1,11 +1,15 @@
 import numpy as np
 from pymunk import ShapeFilter, Vec2d
+
 from minigolf.components import Name, Position
 
 NO_FILTER = ShapeFilter()
 WALL = 1
 GRID_SIZE = 1000
-# Generate a set of sensible shots: directions every 15 degrees, speeds from 100 to 600 in steps of 100, spin 0 only
+# Generate a set of sensible shots:
+# directions every 15 degrees
+# speeds from 100 to 600 in steps of 100
+# spin 0 only
 POSSIBLE_SHOTS = [
     [Vec2d(speed * np.cos(theta), speed * np.sin(theta)), 0.0]
     for speed in [20, 30] + list(range(100, 700, 100))
@@ -45,7 +49,7 @@ class BruteForceAgent:
         hole_x, hole_y = int(hole_pos.x), int(hole_pos.y)
         costs = np.full((GRID_SIZE, GRID_SIZE), np.inf)
         visited = np.zeros((GRID_SIZE, GRID_SIZE), dtype=bool)
-        from heapq import heappush, heappop
+        from heapq import heappop, heappush
 
         heap = []
         # Dijkstra: start from hole, cost 0

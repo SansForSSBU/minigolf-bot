@@ -2,16 +2,21 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from loguru import logger
-import pygame
 import pygame_gui
+from loguru import logger
 
-from minigolf.entity import Entity
-from minigolf.systems.physics import PhysicsSpace
 from minigolf.editor.consts import Tool
+from minigolf.systems.physics import PhysicsSpace
 from minigolf.world import World
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pygame
+
+    from minigolf.entity import Entity
 
 
 @dataclass
