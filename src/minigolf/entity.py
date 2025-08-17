@@ -88,5 +88,11 @@ class Entity:
         ) is not None:
             pos.x, pos.y = from_pymunk_position(col.shape, pymunk_body.position)
 
+        if (vel := self.get(Velocity)) is not None:
+            vel.dx, vel.dy = (
+                float(pymunk_body.velocity.x),
+                float(pymunk_body.velocity.y),
+            )
+
     def to_pygame(self):
         raise NotImplementedError
