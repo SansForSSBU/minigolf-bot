@@ -1,3 +1,4 @@
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from functools import cache
 
 import networkx as nx
@@ -91,20 +92,25 @@ class BruteForceAgent:
                 break
         pos = pymunk_ball.body.position
         end_pos = (pos.x, pos.y)
-        return end_pos
+        return (shot, end_pos)
 
     def print_calc_progress(self, idx, length):
         print(f"Calculating... {100 * (idx / length)}%")
 
     def make_move(self):
-        best_shot = None
-        best_cost = np.inf
-        for idx, shot in enumerate(POSSIBLE_SHOTS):
-            self.print_calc_progress(idx, len(POSSIBLE_SHOTS))
-            end_pos = self.get_end_pos(shot)
-            print(end_pos)
-            cost = self.cost_fn(end_pos)
-            if cost < best_cost:
-                best_cost = cost
-                best_shot = shot
+        shot_evals = []
+        with ThreadPoolExecutor() as thread_executor, ProcessPoolExecutor() as executor:
+            pathfind_future = thread_executor.submit(self.pathfind)
+            futures = [
+                executor.submit(self.get_end_pos, shot) for shot in POSSIBLE_SHOTS
+            ]
+            # Pathfind on main thread while our minions find end positions
+            total = len(futures)
+            for idx, future in enumerate(as_completed(futures), 1):
+                result = future.result()
+                shot_evals.append(result)
+                self.print_calc_progress(idx, total)
+            print("Waiting for pathfind thread to finish...")
+            pathfind_future.result()
+        best_shot, best_cost = min(shot_evals, key=lambda x: self.cost_fn(x[1]))
         return best_shot
