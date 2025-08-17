@@ -1,3 +1,4 @@
+import networkx as nx
 import numpy as np
 from pymunk import ShapeFilter, Vec2d
 
@@ -47,29 +48,15 @@ class BruteForceAgent:
         hole = holes[0]
         hole_pos = hole.get(Position)
         hole_x, hole_y = int(hole_pos.x), int(hole_pos.y)
-        costs = np.full((GRID_SIZE, GRID_SIZE), np.inf)
-        visited = np.zeros((GRID_SIZE, GRID_SIZE), dtype=bool)
-        from heapq import heappop, heappush
-
-        heap = []
-        # Dijkstra: start from hole, cost 0
-        costs[hole_x, hole_y] = 0
-        heappush(heap, (0, hole_x, hole_y))
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        while heap:
-            cost, x, y = heappop(heap)
-            if visited[x, y]:
-                continue
-            visited[x, y] = True
-            for dx, dy in directions:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE:
-                    if wall_pixels[nx, ny] == WALL:
-                        continue  # impassible
-                    new_cost = cost + 1
-                    if new_cost < costs[nx, ny]:
-                        costs[nx, ny] = new_cost
-                        heappush(heap, (new_cost, nx, ny))
+        rows, cols = wall_pixels.shape
+        G = nx.grid_2d_graph(rows, cols)
+        for r, c in np.argwhere(wall_pixels == 1):
+            G.remove_node((r, c))
+        lengths = nx.single_source_shortest_path_length(G, (hole_x, hole_y))
+        # TODO: Make nx return it as np array to avoid this annoying conversion.
+        costs = np.full((rows, cols), np.inf)
+        for (x, y), cost in lengths.items():
+            costs[x, y] = cost
         self._costs = costs
         return costs
 
