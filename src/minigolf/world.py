@@ -30,7 +30,7 @@ class World:
     def create_entity(self) -> Entity:
         eid: int = self._next_id
         self._next_id += 1
-        entity = Entity()
+        entity = Entity(id=eid)
         self.entities[eid] = entity
         return entity
 

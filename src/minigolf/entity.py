@@ -48,8 +48,8 @@ class PhysicsObject:
 
 
 class Entity:
-    def __init__(self):
-        self.id: int | None = None
+    def __init__(self, id: int | None = None):
+        self.id: int | None = id
         self.components: dict[type[BaseModel], BaseModel] = {}
 
     def add(self, component: BaseModel) -> None:
