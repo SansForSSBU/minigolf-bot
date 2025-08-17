@@ -71,18 +71,16 @@ class BruteForceAgent:
     def get_end_pos(self, shot):
         import copy
 
-        # Deep copy the world and physics system to avoid affecting the real game
-        world_copy = copy.deepcopy(self.world)
+        balls = self.world.get_balls()
+        if len(balls) != 1:
+            raise ValueError("Multiple balls found in world")
+        ball_id = balls[0].id
+
         physics_copy = copy.deepcopy(self.physics_system)
-        # Find the ball in the copied world/physics
-        balls = world_copy.get_balls()
-        if not balls:
-            return np.inf  # No ball found
-        ball_entity = balls[0]
-        pymunk_ball = physics_copy.eid_to_body[ball_entity.id]
-        # Set ball velocity for this shot
+        pymunk_ball = physics_copy.eid_to_body[ball_id]
         pymunk_ball.body.velocity = shot[0]
         pymunk_ball.body.angular_velocity = shot[1]
+        # TODO: Move into its own function.
         # Simulate until stop or max steps
         MAX_STEPS = 1000000
         STOPPING_VELOCITY = 10.0
