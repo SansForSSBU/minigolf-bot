@@ -4,7 +4,7 @@ import pymunk
 from pydantic import BaseModel
 
 from minigolf.components import Collider, PhysicsBody, Position, Velocity
-from minigolf.constants import BALL_MOMENT, DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
+from minigolf.consts import BALL_MOMENT, DEFAULT_ELASTICITY, DEFAULT_WALL_FRICTION
 from minigolf.utils import from_pymunk_position, to_pymunk_position
 
 T = TypeVar("T", bound=BaseModel)
@@ -48,8 +48,8 @@ class PhysicsObject:
 
 
 class Entity:
-    def __init__(self):
-        self.id: int | None = None
+    def __init__(self, id: int | None = None):
+        self.id: int | None = id
         self.components: dict[type[BaseModel], BaseModel] = {}
 
     def add(self, component: BaseModel) -> None:
@@ -87,6 +87,12 @@ class Entity:
             col := self.get(Collider)
         ) is not None:
             pos.x, pos.y = from_pymunk_position(col.shape, pymunk_body.position)
+
+        if (vel := self.get(Velocity)) is not None:
+            vel.dx, vel.dy = (
+                float(pymunk_body.velocity.x),
+                float(pymunk_body.velocity.y),
+            )
 
     def to_pygame(self):
         raise NotImplementedError

@@ -1,10 +1,10 @@
-from enum import Enum, auto
+from enum import Enum
 
 
-class GameState(Enum):
+class GameState(str, Enum):
     """Represents the current state of the game."""
 
-    PLAYING = auto()
-    WON = auto()
-    LOST = auto()
-    PAUSED = auto()
+    PLAYING = "PLAYING"
+    WON = "WON"
+    LOST = "LOST"
+    PAUSED = "PAUSED"

@@ -1,13 +1,13 @@
-from enum import Enum, auto
+from enum import Enum
 
 import pygame
 
 
-class Tool(Enum):
-    WALL = auto()
-    BALL = auto()
-    HOLE = auto()
-    ERASER = auto()
+class Tool(str, Enum):
+    WALL = "wall"
+    BALL = "ball"
+    HOLE = "hole"
+    ERASER = "eraser"
 
 
 TOOL_KEYS: dict[int, Tool] = {

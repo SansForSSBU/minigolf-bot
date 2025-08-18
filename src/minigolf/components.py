@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Annotated, Literal
 
 import pygame
@@ -100,3 +101,35 @@ class Renderable(BaseModel):
 
 class Hole(BaseModel):
     pass
+
+
+class Player(BaseModel):
+    id: int
+
+
+class Mode(str, Enum):
+    TURN = "turn"
+    REALTIME = "realtime"
+
+
+class Phase(str, Enum):
+    # Waiting for current player to give a move (or have one queued)
+    AWAIT_INPUT = "AWAIT_INPUT"
+    # Action chosen -> apply velocity to ball
+    APPLY_ACTION = "APPLY_ACTION"
+    # Physics is running, ball still rolling
+    BALL_IN_MOTION = "BALL_IN_MOTION"
+    # Ball has stopped -> check win conditions, advance turn
+    RESOLVE = "RESOLVE"
+
+
+class TurnState(BaseModel):
+    phase: Phase = Phase.AWAIT_INPUT
+    current_player: int = 0
+    mode: Mode = Mode.TURN
+
+
+class Action(BaseModel):
+    type: Literal["strike", "reset"]
+    velocity: tuple[float, float] = (0.0, 0.0)
+    angular_velocity: float = 0.0

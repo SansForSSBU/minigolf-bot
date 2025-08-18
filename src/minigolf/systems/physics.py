@@ -1,7 +1,8 @@
 import pymunk
+from loguru import logger
 
 from minigolf.components import Collider
-from minigolf.constants import DEFAULT_FLOOR_FRICTION
+from minigolf.consts import DEFAULT_FLOOR_FRICTION
 from minigolf.entity import Entity, PhysicsObject
 from minigolf.world import World
 
@@ -11,7 +12,7 @@ class PhysicsSpace:
         self.world = world
         self.space = pymunk.Space()
         self.space.damping = DEFAULT_FLOOR_FRICTION
-        self.eid_to_body = {}
+        self.eid_to_body: dict[int, PhysicsObject] = {}
 
     def populate(self):
         for entity in self.world.entities.values():
@@ -25,13 +26,19 @@ class PhysicsSpace:
             entity = self.world.get_entity(eid)
             entity.sync_with_pymunk_body(phys_obj.body)  # access inner pymunk.Body here
 
+    @logger.catch
     def add_entity(self, entity: Entity) -> None:
+        if entity.id is None:
+            raise ValueError("Entity must have an ID before adding to PhysicsSpace")
         phys_obj = PhysicsObject.from_entity(entity)
         if phys_obj:
             phys_obj.add_to_space(self.space)
             self.eid_to_body[entity.id] = phys_obj
 
+    @logger.catch
     def remove_entity(self, entity: Entity) -> None:
+        if entity.id is None:
+            raise ValueError("Entity must have an ID before adding to PhysicsSpace")
         phys_obj = self.eid_to_body.pop(entity.id, None)
         if phys_obj:
             self.space.remove(phys_obj.body, phys_obj.shape)
