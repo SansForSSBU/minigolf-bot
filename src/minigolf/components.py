@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 from typing import Annotated, Literal
 
 import pygame
@@ -112,15 +112,15 @@ class Mode(str, Enum):
     REALTIME = "realtime"
 
 
-class Phase(Enum):
+class Phase(str, Enum):
     # Waiting for current player to give a move (or have one queued)
-    AWAIT_INPUT = auto()
+    AWAIT_INPUT = "AWAIT_INPUT"
     # Action chosen -> apply velocity to ball
-    APPLY_ACTION = auto()
+    APPLY_ACTION = "APPLY_ACTION"
     # Physics is running, ball still rolling
-    BALL_IN_MOTION = auto()
+    BALL_IN_MOTION = "BALL_IN_MOTION"
     # Ball has stopped -> check win conditions, advance turn
-    RESOLVE = auto()
+    RESOLVE = "RESOLVE"
 
 
 class TurnState(BaseModel):
