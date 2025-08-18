@@ -1,16 +1,21 @@
 from dataclasses import dataclass
+from math import hypot
 
 from loguru import logger
 
 from minigolf.components import Circle, Collider, Hole, Position, Velocity
 from minigolf.consts import (
     FUNNEL_DAMPING,
+    FUNNEL_EXTRA,
     FUNNEL_RADIUS,
     FUNNEL_STRENGTH,
     VELOCITY_THRESHOLD,
 )
 from minigolf.entity import Entity
 from minigolf.world import World
+
+# Numerical guard for zero-length vectors
+EPS = 1e-6
 
 
 @dataclass(frozen=True)
@@ -45,21 +50,28 @@ def apply_funnel(
     ball_pos, ball_vel = ball.get(Position), ball.get(Velocity)
     hole_pos = hole.get(Position)
 
-    dx, dy = hole_pos.x - ball_pos.x, hole_pos.y - ball_pos.y
-    dist2 = dx * dx + dy * dy
-    if dist2 > radius * radius:
-        return  # outside funnel zone, do nothing
+    # Offset vector
+    ox = hole_pos.x - ball_pos.x
+    oy = hole_pos.y - ball_pos.y
+    sep_sq = ox * ox + oy * oy
+    if sep_sq > radius * radius:
+        # Outside funnel zone
+        return
 
-    dist = dist2**0.5
-    if dist < 1e-6:
-        return  # already at hole centre (avoid divide by zero)
+    sep = hypot(ox, oy)
 
-    # Normalised direction vector pointing ball → hole
-    nx, ny = dx / dist, dy / dist
+    # Already at centre; avoid divide-by-zero
+    if sep < EPS:
+        return
 
-    # Update velocity with funnel pull + damping
-    ball_vel.dx = ball_vel.dx * damping + nx * strength * dist
-    ball_vel.dy = ball_vel.dy * damping + ny * strength * dist
+    # Unit direction * scaled pull
+    pull_mag = strength * sep
+    inv_sep = 1.0 / sep
+    nx, ny = ox * inv_sep, oy * inv_sep
+
+    # Damped current velocity + pull
+    ball_vel.dx = ball_vel.dx * damping + nx * pull_mag
+    ball_vel.dy = ball_vel.dy * damping + ny * pull_mag
 
 
 def win_condition_system(world: World) -> list[WinEvent]:
@@ -91,7 +103,6 @@ def win_condition_system(world: World) -> list[WinEvent]:
         return []
 
     hole_radius = hole_col.shape.radius
-    funnel_extra = 40.0  # extra reach beyond hole radius for funnel effect
 
     events: list[WinEvent] = []
     for ball in world.get_balls():
@@ -110,36 +121,43 @@ def win_condition_system(world: World) -> list[WinEvent]:
         if ball.id is None or hole.id is None:
             continue
 
-        dx, dy = ball_pos.x - hole_pos.x, ball_pos.y - hole_pos.y
-        dist2 = dx * dx + dy * dy
-        dist = dist2**0.5
-
         ball_radius = ball_col.shape.radius
-        speed = (ball_vel.dx * ball_vel.dx + ball_vel.dy * ball_vel.dy) ** 0.5
 
-        # Funnel zone check
-        if dist2 <= (hole_radius + ball_radius + funnel_extra) ** 2:
+        # Geometry
+        # Offset vectors
+        ox = ball_pos.x - hole_pos.x
+        oy = ball_pos.y - hole_pos.y
+        sep_sq = ox * ox + oy * oy
+        r_contact = hole_radius + ball_radius
+        r_funnel = r_contact + FUNNEL_EXTRA
+
+        # Kinematics
+        vx, vy = ball_vel.dx, ball_vel.dy
+        speed_sq = vx * vx + vy * vy
+
+        # Funnel zone
+        if sep_sq <= r_funnel * r_funnel:
             apply_funnel(ball, hole)
 
         # Win condition check
-        in_hole = dist2 <= (hole_radius + ball_radius) ** 2
-        slow_enough = (
-            ball_vel.dx * ball_vel.dx + ball_vel.dy * ball_vel.dy
-        ) <= VELOCITY_THRESHOLD**2
+        in_hole = sep_sq <= r_contact * r_contact
+        slow_enough = speed_sq <= VELOCITY_THRESHOLD * VELOCITY_THRESHOLD
 
         if in_hole:
+            sep = hypot(ox, oy)
+            speed = hypot(vx, vy)
             logger.debug(
-                f"[HoleEntry] Ball {ball.id} entered Hole {hole.id} "
-                f"dist={dist:.2f}, speed={speed:.2f}"
+                f"[HoleEntry] Ball {ball.id} -> Hole {hole.id}"
+                f" dist={sep:.2f}, speed={speed:.2f}"
             )
             if slow_enough:
                 logger.info(
                     f"[Win] Ball {ball.id} captured in Hole {hole.id} "
-                    f"dist={dist:.2f}, speed={speed:.2f}"
+                    f" dist={sep:.2f}, speed={speed:.2f}"
                 )
-                # Snap ball to hole centre and freeze
+                # Snap + freeze
                 ball_pos.x, ball_pos.y = hole_pos.x, hole_pos.y
-                ball_vel.dx, ball_vel.dy = 0.0, 0.0
-                events.append(WinEvent(ball.id, hole.id, dist, speed))
+                ball_vel.dx = ball_vel.dy = 0.0
+                events.append(WinEvent(ball.id, hole.id, sep, speed))
 
     return events

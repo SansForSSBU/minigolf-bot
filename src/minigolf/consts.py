@@ -16,7 +16,13 @@ DEFAULT_MOVES: list[list[Vec2d | float]] = list(
 STOPPING_VELOCITY: float = 10.0
 VELOCITY_THRESHOLD: float = 50.0
 
-# How far from the hole the pull begins
+# Outer proximity gate for enabling the funnel.
+# When the ball is within (hole_radius + ball_radius + FUNNEL_EXTRA),
+# win_condition_system will *attempt* to apply the funnel pull.
+FUNNEL_EXTRA: float = 40.0
+# Inner funnel radius, measured from hole centre.
+# If the ball is within this distance, apply_funnel will apply
+# a distance-proportional pull toward the hole (with damping).
 FUNNEL_RADIUS: float = 40.0
 # How strong the pull is each frame (experiment: 0.05 → 0.5)
 FUNNEL_STRENGTH: float = 0.15
