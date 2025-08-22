@@ -125,4 +125,6 @@ class Game:
     def _get_turn_manager(self) -> Entity | None:
         """Return the TurnManager entity, if any."""
         matches = self.world.all_with(TurnState)
+        if len(matches) > 1:
+            raise RuntimeError("Multiple TurnManager entities found!")
         return matches[0] if matches else None
