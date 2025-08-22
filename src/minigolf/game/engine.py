@@ -70,7 +70,7 @@ class Game:
         Poll a player’s controller for an Action and attach it to their ball.
         (Low-level helper; step() uses _maybe_request_action.)
         """
-        ctrl = self.controllers[player_id]
+        ctrl: Controller = self.controllers[player_id]
         act = ctrl.act(self.world, player_id)
         if not act:
             return

@@ -13,12 +13,14 @@ Contracts:
 - Controllers add Action components to their player’s ball.
 """
 
+import pymunk
 from loguru import logger
 from pymunk import Vec2d
 
 from minigolf.components import Action, Phase, Player, TurnState, Velocity
 from minigolf.consts import STOPPING_VELOCITY
 from minigolf.entity import Entity
+from minigolf.systems.physics import PhysicsSpace
 from minigolf.world import World
 
 # Helpers for TurnManager lifecycle
@@ -87,7 +89,7 @@ def consume_action(entity: Entity) -> Action | None:
         return act
 
 
-def apply_action_to_body(action: Action, body) -> None:
+def apply_action_to_body(action: Action, body: pymunk.Body) -> None:
     """
     Apply an Action directly to a pymunk body:
     - strike: set linear and angular velocity
@@ -106,7 +108,7 @@ def apply_action_to_body(action: Action, body) -> None:
 # Turn system entry point
 
 
-def turn_system(world: World, physics) -> None:
+def turn_system(world: World, physics: PhysicsSpace) -> None:
     """
     Main gameplay loop logic for turn progression.
 
@@ -160,7 +162,7 @@ def turn_system(world: World, physics) -> None:
 # Realtime mode
 
 
-def _realtime_tick(world: World, physics) -> None:
+def _realtime_tick(world: World, physics: PhysicsSpace) -> None:
     """
     In realtime mode:
     - Any entity with an Action gets it applied immediately.
