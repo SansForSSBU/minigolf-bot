@@ -1,8 +1,8 @@
 from typing import Protocol
 
 from minigolf.components import Action
-from minigolf.world import World
+from minigolf.observation import Observation
 
 
 class Controller(Protocol):
-    def act(self, world: World, player_id: int) -> Action | None: ...
+    def act(self, obs: Observation, player_id: int) -> Action | None: ...

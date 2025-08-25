@@ -5,7 +5,7 @@ from loguru import logger
 from minigolf.components import Action
 from minigolf.consts import DEFAULT_MOVES
 from minigolf.controllers import Controller
-from minigolf.world import World
+from minigolf.observation import Observation
 
 if TYPE_CHECKING:
     from pymunk import Vec2d
@@ -18,7 +18,7 @@ class SequenceController(Controller):
         self._moves: list[list[Vec2d | float]] = list(moves)
         self._i = 0
 
-    def act(self, world: World, player_id: int) -> Action | None:
+    def act(self, obs: Observation, player_id: int) -> Action | None:
         if self._i >= len(self._moves):
             return None
         v, av = self._moves[self._i]
