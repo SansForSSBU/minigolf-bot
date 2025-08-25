@@ -17,6 +17,7 @@ from minigolf.components import Mode, Phase, Player, TurnState
 from minigolf.controllers import Controller
 from minigolf.entity import Entity
 from minigolf.game.state import GameState
+from minigolf.observation import observe
 from minigolf.systems.physics import PhysicsSpace
 from minigolf.systems.turn import ensure_turn_manager, get_player_ball, turn_system
 from minigolf.systems.win import win_condition_system
@@ -70,14 +71,20 @@ class Game:
         Poll a player’s controller for an Action and attach it to their ball.
         (Low-level helper; step() uses _maybe_request_action.)
         """
-        ctrl: Controller = self.controllers[player_id]
-        act = ctrl.act(self.world, player_id)
-        if not act:
+        ctrl: Controller | None = self.controllers.get(player_id)
+        if ctrl is None:
             return
-        for ball in self.world.all_with(Player):
-            if ball.get(Player).id == player_id:
-                ball.add(act)
-                return
+
+        ball = get_player_ball(world=self.world, player_id=player_id)
+        if ball.id is None:
+            e: str = f"{player_id=} ball has no id"
+            logger.exception(e)
+            return
+
+        obs = observe(self.world, ball.id)
+        act = ctrl.act(obs, player_id)
+        if act:
+            ball.add(act)
 
     # Frame loop
 
@@ -97,7 +104,7 @@ class Game:
         tm = self._get_turn_manager()
         if tm and tm.get(TurnState).phase is Phase.AWAIT_INPUT:
             pid = tm.get(TurnState).current_player
-            self._maybe_request_action(pid)
+            self.request_action(pid)
 
         # 2. Physics integration
         self.physics.step(dt)
@@ -111,16 +118,6 @@ class Game:
             self.world.game_state = GameState.WON
             logger.debug("[Game] Win detected, halting loop")
             return evt
-
-    # Internal helpers
-
-    def _maybe_request_action(self, pid: int) -> None:
-        """Ask a controller for an action if available and attach to ball."""
-        ctrl = self.controllers[pid]
-        act = ctrl.act(world=self.world, player_id=pid)
-        if act:
-            ball = get_player_ball(world=self.world, player_id=pid)
-            ball.add(act)
 
     def _get_turn_manager(self) -> Entity | None:
         """Return the TurnManager entity, if any."""
