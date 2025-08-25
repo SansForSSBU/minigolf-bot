@@ -27,3 +27,11 @@ jobs:
 
       - name: Run tests with coverage
         run: make test
+
+- name: Regenerate test levels
+  run: uv run python -m minigolf.game.levels tests/level1.json
+
+- name: Check generated assets are committed
+  run: |
+    git diff -- tests/level1.json
+    git diff --quiet -- tests/level1.json      

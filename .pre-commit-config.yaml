@@ -7,3 +7,10 @@ repos:
       - id: ruff-check
       # Run the formatter.
       - id: ruff-format
+  - repo: local
+    hooks:
+      - id: regen-test-levels
+        name: Regen test levels
+        language: system
+        entry: uv run python -m minigolf.game.levels tests/level1.json
+        pass_filenames: false
